@@ -8,6 +8,11 @@ on:
   release:
     types: [ created ]
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -65,12 +70,17 @@ jobs:
         cd exemplo-tempo-plugin
         npm run build
     
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: exemplo-tempo-plugin/dist
-        cname: tempo-plugin-br.netlify.app
+        path: exemplo-tempo-plugin/dist
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
 
   publish:
     needs: test
@@ -139,14 +149,4 @@ jobs:
       run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    
-    - name: Create Git Tag
-      if: steps.version-check.outputs.changed == 'true'
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git tag v${{ steps.version-check.outputs.current }}
-        git push origin v${{ steps.version-check.outputs.current }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
