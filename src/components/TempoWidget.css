@@ -1,0 +1,57 @@
+.tempo-widget {
+  position: fixed;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.tempo-widget:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.tempo-widget:active {
+  transform: scale(0.95);
+}
+
+.tempo-widget-loading {
+  animation: spin 1s linear infinite;
+}
+
+.tempo-widget-error {
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsividade para diferentes tamanhos de tela */
+@media (max-width: 768px) {
+  .tempo-widget {
+    position: fixed !important;
+  }
+}
+
+/* Garantir que o widget fique sempre visível */
+.tempo-widget {
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 100px;
+  max-height: 100px;
+}
+

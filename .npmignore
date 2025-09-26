@@ -1,0 +1,52 @@
+# Source files
+src/
+.github/
+*.config.js
+*.config.ts
+tsconfig.json
+
+# Development files
+.eslintrc*
+.prettierrc*
+jest.config.js
+rollup.config.js
+
+# Tests
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+setupTests.ts
+
+# Documentation (keep README.md)
+docs/
+
+# Development dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Environment
+.env*
+
+# Git
+.git/
+.gitignore
+
