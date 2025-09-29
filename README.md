@@ -1,5 +1,7 @@
 # Tempo Plugin BR
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-red)](https://github.com/sponsors/Ranilson-Nascimento)
+
 Um plugin React moderno para exibir a temperatura brasileira em tempo real com componente flutuante e arrastável.
 
 ## Demonstração

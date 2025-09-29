@@ -1,6 +1,6 @@
 {
   "name": "tempo-plugin-br",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "Plugin React para exibir temperatura brasileira em tempo real com componente flutuante e arrastável",
   "main": "dist/index.js",
