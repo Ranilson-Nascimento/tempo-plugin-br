@@ -56,7 +56,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "react-draggable": "^4.4.5"
   },
   "repository": {
     "type": "git",

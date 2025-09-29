@@ -10,6 +10,25 @@ export interface WeatherData {
   pressure: number;
   visibility: number;
   uvIndex: number;
+  // Novos dados adicionais
+  windDirection?: number; // Direção do vento em graus
+  cloudCover?: number; // Cobertura de nuvens em %
+  precipitationProbability?: number; // Probabilidade de precipitação em %
+  sunrise?: string; // Horário do nascer do sol
+  sunset?: string; // Horário do pôr do sol
+  // Previsão para próximos dias
+  forecast?: DailyForecast[];
+}
+
+export interface DailyForecast {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  precipitation: number;
+  precipitationProbability: number;
+  uvIndexMax: number;
+  description: string;
+  icon: string;
 }
 
 export interface TempoPluginProps {
@@ -51,6 +70,22 @@ export interface ApiResponse {
     apparent_temperature: number[];
     pressure_msl: number[];
     visibility: number[];
+    precipitation_probability?: number[];
+    windspeed_10m?: number[];
+    winddirection_10m?: number[];
+    cloudcover?: number[];
+    uv_index?: number[];
+  };
+  daily?: {
+    time: string[];
+    sunrise?: string[];
+    sunset?: string[];
+    precipitation_sum?: number[];
+    precipitation_probability_max?: number[];
+    temperature_2m_max?: number[];
+    temperature_2m_min?: number[];
+    uv_index_max?: number[];
+    weathercode?: number[];
   };
 }
 

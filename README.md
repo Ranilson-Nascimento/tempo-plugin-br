@@ -1,25 +1,25 @@
-# 🌡️ Tempo Plugin BR
+# Tempo Plugin BR
 
-Um plugin React moderno e elegante para exibir a temperatura brasileira em tempo real com um componente flutuante e arrastável.
+Um plugin React moderno para exibir a temperatura brasileira em tempo real com componente flutuante e arrastável.
 
-## 🚀 Demonstração
+## Demonstração
 
 Veja o plugin em ação: **[Demo Interativa](https://ranilson-nascimento.github.io/tempo-plugin-br/)**
 
-> 💡 **Experimente**: Arraste o widget, clique para ver detalhes e teste todas as funcionalidades!
+Experimente: Arraste o widget, clique para ver detalhes e teste todas as funcionalidades!
 
-## ✨ Características
+## Características
 
-- 🎯 **Plug-and-Play**: Funciona imediatamente após a instalação
-- 🌍 **API Brasileira**: Usa APIs gratuitas e confiáveis para dados meteorológicos
-- 🎨 **Totalmente Customizável**: Cores, tamanho e posição personalizáveis
-- 📱 **Responsivo**: Funciona perfeitamente em desktop e mobile
-- 🖱️ **Arrastável**: Interface intuitiva para reposicionar o widget
-- ⚡ **Leve e Rápido**: Bundle otimizado e performance excelente
-- 🔄 **Atualização Automática**: Dados atualizados automaticamente
-- 🏙️ **Múltiplas Cidades**: Suporte para qualquer cidade brasileira
+- Plug-and-Play: Funciona imediatamente após a instalação
+- API Brasileira: Usa APIs gratuitas e confiáveis para dados meteorológicos
+- Totalmente Customizável: Cores, tamanho e posição personalizáveis
+- Responsivo: Funciona perfeitamente em desktop e mobile
+- Arrastável: Interface intuitiva para reposicionar o widget
+- Leve e Rápido: Bundle otimizado e performance excelente
+- Atualização Automática: Dados atualizados automaticamente
+- Múltiplas Cidades: Suporte para qualquer cidade brasileira
 
-## 🚀 Instalação
+## Instalação
 
 ```bash
 npm install tempo-plugin-br
@@ -31,13 +31,13 @@ ou
 yarn add tempo-plugin-br
 ```
 
-## 📖 Uso Básico
+## Uso Básico
 
 ### Importação Simples
 
 ```jsx
 import React from 'react';
-import TempoWidget from 'tempo-plugin-br';
+import { TempoWidget } from 'tempo-plugin-br';
 
 function App() {
   return (
@@ -86,7 +86,7 @@ function App() {
 export default App;
 ```
 
-## ⚙️ Propriedades (Props)
+## Propriedades (Props)
 
 | Propriedade | Tipo | Padrão | Descrição |
 |-------------|------|--------|-----------|
@@ -100,7 +100,7 @@ export default App;
 | `onTemperatureUpdate` | `function` | `undefined` | Callback chamado quando a temperatura é atualizada |
 | `onCityChange` | `function` | `undefined` | Callback chamado quando a cidade é alterada |
 
-## 🎨 Exemplos de Customização
+## Exemplos de Customização
 
 ### Widget Pequeno e Discreto
 
@@ -135,7 +135,7 @@ export default App;
 />
 ```
 
-## 🌐 Funcionalidades
+## Funcionalidades
 
 ### Widget Flutuante
 - O widget aparece como uma bolinha flutuante na tela
@@ -145,7 +145,8 @@ export default App;
 
 ### Modal Informativo
 - Clique no widget para abrir um modal com informações detalhadas
-- Mostra temperatura, sensação térmica, umidade, vento, pressão e visibilidade
+- Mostra temperatura, sensação térmica, umidade, vento, pressão, visibilidade, UV, nuvens e chuva
+- Previsão de 3 dias com temperaturas máxima e mínima
 - Interface para alterar a cidade
 - Design moderno com gradientes e efeitos visuais
 
@@ -154,24 +155,24 @@ export default App;
 - Fallback para São Paulo caso a geolocalização falhe
 - Suporte para qualquer cidade brasileira
 
-## 🔧 API de Dados
+## API de Dados
 
 O plugin utiliza a API gratuita **Open-Meteo** que oferece:
-- ✅ Dados meteorológicos precisos e atualizados
-- ✅ Sem necessidade de chave de API
-- ✅ Sem limites de requisições para uso não comercial
-- ✅ Suporte completo ao Brasil
-- ✅ Dados em português
+- Dados meteorológicos precisos e atualizados
+- Sem necessidade de chave de API
+- Sem limites de requisições para uso não comercial
+- Suporte completo ao Brasil
+- Dados em português
 
-## 📱 Compatibilidade
+## Compatibilidade
 
-- ✅ React 16.8+
-- ✅ TypeScript
-- ✅ Todos os navegadores modernos
-- ✅ Mobile e Desktop
-- ✅ SSR (Server-Side Rendering)
+- React 16.8+
+- TypeScript
+- Todos os navegadores modernos
+- Mobile e Desktop
+- SSR (Server-Side Rendering)
 
-## 🛠️ Desenvolvimento
+## Desenvolvimento
 
 ### Clonando o Repositório
 
@@ -210,7 +211,7 @@ npm run dev
 
 Acesse `http://localhost:5173` para ver a demonstração interativa.
 
-## 🤝 Contribuição
+## Contribuição
 
 Contribuições são bem-vindas! Por favor:
 
@@ -220,23 +221,22 @@ Contribuições são bem-vindas! Por favor:
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📄 Licença
+## Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🙏 Agradecimentos
+## Agradecimentos
 
 - [Open-Meteo](https://open-meteo.com/) pela API gratuita de dados meteorológicos
-- [React Draggable](https://github.com/react-grid-layout/react-draggable) pela funcionalidade de arrastar
 - Comunidade React brasileira pelo feedback e suporte
 
-## 📞 Suporte
+## Suporte
 
 Se você encontrar algum problema ou tiver sugestões:
 
-- 🐛 [Reporte bugs](https://github.com/Ranilson-Nascimento/tempo-plugin-br/issues)
-- 💡 [Sugira melhorias](https://github.com/Ranilson-Nascimento/tempo-plugin-br/issues)
-- 📧 Entre em contato: [ranilson.nascimento93@gmail.com]
+- Reporte bugs
+- Sugira melhorias
+- Entre em contato: ranilson.nascimento93@gmail.com
 
 ---
 
