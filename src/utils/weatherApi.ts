@@ -27,7 +27,9 @@ const WEATHER_CODES: { [key: number]: { description: string; icon: string } } = 
 export class WeatherService {
   private static instance: WeatherService;
   private cache: Map<string, { data: WeatherData; timestamp: number }> = new Map();
+  private cityNameCache: Map<string, { name: string; timestamp: number }> = new Map();
   private readonly CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
+  private readonly CITY_CACHE_DURATION = 60 * 60 * 1000; // 1 hora
 
   static getInstance(): WeatherService {
     if (!WeatherService.instance) {
@@ -37,12 +39,10 @@ export class WeatherService {
   }
 
   async getCurrentLocation(): Promise<GeoLocation> {
+    if (typeof window === 'undefined' || !window.navigator?.geolocation) {
+      return Promise.reject(new Error('Geolocalização não disponível'));
+    }
     return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocalização não suportada'));
-        return;
-      }
-
       navigator.geolocation.getCurrentPosition(
         (position) => {
           resolve({
@@ -51,7 +51,6 @@ export class WeatherService {
           });
         },
         (error) => {
-          // Fallback para São Paulo se não conseguir obter localização
           console.warn('Erro ao obter localização, usando São Paulo como padrão:', error);
           resolve({
             latitude: -23.5505,
@@ -67,31 +66,24 @@ export class WeatherService {
   }
 
   async getCityNameFromCoordinates(location: GeoLocation): Promise<string> {
+    const cacheKey = `${location.latitude},${location.longitude}`;
+    const cached = this.cityNameCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.CITY_CACHE_DURATION) {
+      return cached.name;
+    }
     try {
-      // Usando Nominatim (OpenStreetMap) para geocodificação reversa
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}&zoom=10&addressdetails=1`
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.latitude}&longitude=${location.longitude}&localityLanguage=pt`
       );
-      
-      if (!response.ok) {
-        throw new Error('Erro ao buscar nome da cidade');
-      }
-
+      if (!response.ok) throw new Error('Erro ao buscar nome da cidade');
       const data = await response.json();
-      
-      if (data && data.address) {
-        // Prioriza município/cidade, depois estado
-        const city = data.address.city || data.address.town || data.address.village || data.address.municipality || data.name;
-        const state = data.address.state;
-        
-        if (city && state) {
-          return `${city}, ${state}`;
-        } else if (city) {
-          return city;
-        }
-      }
-      
-      return 'Cidade Desconhecida';
+      const city = data?.city || data?.locality;
+      const code = data?.principalSubdivisionCode; // ex: "BR-SP" -> UF "SP"
+      const uf = code && /^BR-/i.test(code) ? code.replace(/^BR-/i, '') : (data?.principalSubdivision || '');
+      const name =
+        city && uf ? `${city} - ${uf}` : city || data?.locality || 'Cidade Desconhecida';
+      this.cityNameCache.set(cacheKey, { name, timestamp: Date.now() });
+      return name;
     } catch (error) {
       console.error('Erro ao buscar nome da cidade:', error);
       return 'Cidade Desconhecida';
@@ -124,17 +116,14 @@ export class WeatherService {
     }
   }
 
-  async getWeatherData(location: GeoLocation, cityName?: string): Promise<WeatherData> {
-    const cacheKey = `${location.latitude},${location.longitude}`;
+  async getWeatherData(location: GeoLocation, cityName?: string, forecastDays: 3 | 5 | 7 = 3): Promise<WeatherData> {
+    const cacheKey = `${location.latitude},${location.longitude},${forecastDays}`;
     const cached = this.cache.get(cacheKey);
-    
     if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
       return cached.data;
     }
-
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,apparent_temperature,pressure_msl,visibility,precipitation_probability,windspeed_10m,winddirection_10m,cloudcover,uv_index&daily=sunrise,sunset,precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min,uv_index_max,weathercode&timezone=America/Sao_Paulo&forecast_days=3`;
-      
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,apparent_temperature,pressure_msl,visibility,precipitation_probability,windspeed_10m,winddirection_10m,cloudcover,uv_index&daily=sunrise,sunset,precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min,uv_index_max,weathercode&timezone=America/Sao_Paulo&forecast_days=${forecastDays}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -146,16 +135,13 @@ export class WeatherService {
       const weatherCode = data.current_weather.weathercode;
       const weatherInfo = WEATHER_CODES[weatherCode] || { description: 'Desconhecido', icon: '❓' };
       
-      // Se não temos cityName, faz geocodificação reversa
-      let finalCityName = cityName;
-      if (!finalCityName) {
-        finalCityName = await this.getCityNameFromCoordinates(location);
-      }
+      let finalCityName = await this.getCityNameFromCoordinates(location);
+      if (finalCityName === 'Cidade Desconhecida' && cityName) finalCityName = cityName;
 
-      // Processa previsão dos próximos dias
-      const forecast: any[] = [];
-      if (data.daily && data.daily.time) {
-        for (let i = 0; i < Math.min(data.daily.time.length, 3); i++) {
+      const maxDays = Math.min(forecastDays, data.daily?.time?.length ?? 0);
+      const forecast: Array<{ date: string; tempMax: number; tempMin: number; precipitation: number; precipitationProbability: number; uvIndexMax: number; description: string; icon: string }> = [];
+      if (data.daily?.time) {
+        for (let i = 0; i < maxDays; i++) {
           const dailyWeatherCode = data.daily.weathercode?.[i] || 0;
           const dailyWeatherInfo = WEATHER_CODES[dailyWeatherCode] || { description: 'Desconhecido', icon: '❓' };
           
@@ -171,11 +157,8 @@ export class WeatherService {
           });
         }
       }
-      
-      // Calcular cloudCover de forma mais inteligente
       let cloudCoverValue = 0;
       if (data.hourly.cloudcover && data.hourly.cloudcover.length > 0) {
-        // Pegar a média das próximas 3 horas para ter um valor mais representativo
         const nextHours = data.hourly.cloudcover.slice(0, 3);
         cloudCoverValue = Math.round(nextHours.reduce((sum, val) => sum + val, 0) / nextHours.length);
       }
@@ -191,8 +174,7 @@ export class WeatherService {
         feelsLike: Math.round(data.hourly.apparent_temperature[0] || data.current_weather.temperature),
         pressure: Math.round(data.hourly.pressure_msl[0] || 1013),
         visibility: Math.round((data.hourly.visibility[0] || 10000) / 1000),
-        uvIndex: Math.round(data.daily?.uv_index_max?.[0] || 0), // Usar o máximo do dia atual
-        // Novos dados
+        uvIndex: Math.round(data.daily?.uv_index_max?.[0] || 0),
         windDirection: data.hourly.winddirection_10m?.[0],
         cloudCover: cloudCoverValue, // Usar valor calculado
         precipitationProbability: data.daily?.precipitation_probability_max?.[0] || 0, // Probabilidade máxima do dia
@@ -209,9 +191,9 @@ export class WeatherService {
     }
   }
 
-  async getWeatherByCity(cityName: string): Promise<WeatherData> {
+  async getWeatherByCity(cityName: string, forecastDays: 3 | 5 | 7 = 3): Promise<WeatherData> {
     const location = await this.getCityCoordinates(cityName);
-    return this.getWeatherData(location, cityName);
+    return this.getWeatherData(location, cityName, forecastDays);
   }
 }
 

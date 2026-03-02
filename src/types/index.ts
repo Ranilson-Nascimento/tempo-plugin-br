@@ -10,13 +10,11 @@ export interface WeatherData {
   pressure: number;
   visibility: number;
   uvIndex: number;
-  // Novos dados adicionais
-  windDirection?: number; // Direção do vento em graus
-  cloudCover?: number; // Cobertura de nuvens em %
-  precipitationProbability?: number; // Probabilidade de precipitação em %
-  sunrise?: string; // Horário do nascer do sol
-  sunset?: string; // Horário do pôr do sol
-  // Previsão para próximos dias
+  windDirection?: number;
+  cloudCover?: number;
+  precipitationProbability?: number;
+  sunrise?: string;
+  sunset?: string;
   forecast?: DailyForecast[];
 }
 
@@ -31,25 +29,23 @@ export interface DailyForecast {
   icon: string;
 }
 
+export type TempoErrorType = 'location' | 'weather' | 'city';
+export type TempoTheme = 'default' | 'light' | 'dark';
+
 export interface TempoPluginProps {
-  /** Posição inicial X do widget (padrão: 20) */
   initialX?: number;
-  /** Posição inicial Y do widget (padrão: 20) */
   initialY?: number;
-  /** Cidade inicial (padrão: detecta automaticamente) */
   initialCity?: string;
-  /** Cor de fundo do widget (padrão: '#007bff') */
   backgroundColor?: string;
-  /** Cor do texto (padrão: '#ffffff') */
   textColor?: string;
-  /** Tamanho do widget em pixels (padrão: 60) */
   size?: number;
-  /** Intervalo de atualização em minutos (padrão: 10) */
   updateInterval?: number;
-  /** Callback chamado quando a temperatura é atualizada */
+  forecastDays?: 3 | 5 | 7;
+  positionStorageKey?: string | null;
+  theme?: TempoTheme;
   onTemperatureUpdate?: (data: WeatherData) => void;
-  /** Callback chamado quando a cidade é alterada */
   onCityChange?: (city: string) => void;
+  onError?: (error: Error, type: TempoErrorType) => void;
 }
 
 export interface GeoLocation {

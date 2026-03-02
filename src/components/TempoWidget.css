@@ -1,57 +1,74 @@
+.tempo-widget,
+.tempo-widget * {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 .tempo-widget {
   position: fixed;
   z-index: 9999;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  will-change: transform;
 }
 
 .tempo-widget:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .tempo-widget:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
+}
+
+.tempo-widget:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
 }
 
 .tempo-widget-loading {
-  animation: spin 1s linear infinite;
+  animation: tempo-spin 1.2s linear infinite;
 }
 
 .tempo-widget-error {
-  animation: pulse 1s ease-in-out infinite alternate;
+  animation: tempo-pulse 1.2s ease-in-out infinite alternate;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.tempo-widget-icon,
+.tempo-widget-temp,
+.tempo-widget-city {
+  line-height: 1.2;
+  margin: 1px 0;
+  text-align: center;
 }
 
-@keyframes pulse {
-  from {
-    opacity: 0.5;
-  }
-  to {
-    opacity: 1;
-  }
+.tempo-widget-city {
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.95;
 }
 
-/* Responsividade para diferentes tamanhos de tela */
+@keyframes tempo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes tempo-pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
 @media (max-width: 768px) {
   .tempo-widget {
     position: fixed !important;
   }
 }
 
-/* Garantir que o widget fique sempre visível */
 .tempo-widget {
   min-width: 40px;
   min-height: 40px;
   max-width: 100px;
   max-height: 100px;
 }
-

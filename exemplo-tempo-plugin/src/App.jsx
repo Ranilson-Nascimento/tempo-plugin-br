@@ -1,137 +1,242 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { TempoWidget } from '../../dist/index.esm.js';
 import '../../dist/index.esm.css';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  ThermometerSun,
+  MapPin,
+  Palette,
+  Hand,
+  ShieldCheck,
+  Zap,
+  ChevronRight,
+  Github,
+  Cloud,
+} from 'lucide-react';
 import './App.css';
 
+const DEMO_STORAGE_KEY = 'tempo-plugin-br-demo-position';
+
 function App() {
-  const [currentLocation, setCurrentLocation] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
-  const [locationStatus, setLocationStatus] = useState('Detectando localização...');
+  const [lastError, setLastError] = useState(null);
+  const [modalTheme, setModalTheme] = useState('default');
 
-  const handleTemperatureUpdate = (data) => {
-    console.log('Nova temperatura:', data);
+  const handleTemperatureUpdate = useCallback((data) => {
     setWeatherData(data);
-  };
+    setLastError(null);
+  }, []);
 
-  const handleCityChange = (city) => {
-    console.log('Cidade alterada para:', city);
-  };
+  const handleCityChange = useCallback((city) => {
+    setLastError(null);
+  }, []);
 
-  useEffect(() => {
-    // Tentar obter localização
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          setLocationStatus(`Localização detectada: ${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
-        },
-        (error) => {
-          console.log('Erro ao obter localização:', error);
-          setLocationStatus('Localização não permitida - usando São Paulo como padrão');
-        },
-        { timeout: 10000 }
-      );
-    } else {
-      setLocationStatus('Geolocalização não suportada - usando São Paulo');
-    }
+  const handleError = useCallback((error, type) => {
+    setLastError({ message: error.message, type });
   }, []);
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center p-4'>
-      <div className='text-center max-w-6xl mx-auto'>
-        <h1 className='text-5xl font-bold text-white mb-4 drop-shadow-lg'>
-          🌡️ Tempo Plugin BR
-        </h1>
-        <p className='text-xl text-white mb-2 drop-shadow'>
-          Demonstração Interativa do Plugin React
+    <div className="demo-app">
+      <header className="demo-header">
+        <div className="demo-header-inner">
+          <div className="demo-logo">
+            <span className="demo-logo-icon">🌡️</span>
+            <div>
+              <h1 className="demo-logo-title">Tempo Plugin BR</h1>
+              <p className="demo-logo-subtitle">Widget de clima para React</p>
+            </div>
+          </div>
+          <Badge variant="secondary" className="demo-badge-version">
+            v2.0
+          </Badge>
+        </div>
+      </header>
+
+      <main className="demo-main">
+        <section className="demo-hero">
+          <div className="demo-hero-content">
+            <Badge className="demo-hero-badge">Demonstração ao vivo</Badge>
+            <h2 className="demo-hero-title">
+              Clima brasileiro em tempo real no seu app
+            </h2>
+            <p className="demo-hero-desc">
+              Arraste o widget, clique para ver detalhes e troque de cidade. A posição é salva
+              automaticamente. Experimente no celular: arraste com o dedo.
+            </p>
+            {weatherData && (
+              <div className="demo-hero-live">
+                <span className="demo-hero-live-dot" />
+                <span>
+                  {weatherData.city} — {weatherData.temperature}°C, {weatherData.description}
+                </span>
+              </div>
+            )}
+            {lastError && (
+              <div className="demo-hero-error">
+                Erro ({lastError.type}): {lastError.message}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="demo-section">
+          <h3 className="demo-section-title">Recursos da v2</h3>
+          <div className="demo-cards">
+            <Card className="demo-card">
+              <CardHeader>
+                <Hand className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Touch e mouse</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  Arraste no desktop e no mobile com o dedo. Funciona em qualquer dispositivo.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="demo-card">
+              <CardHeader>
+                <Palette className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Temas do modal</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  Tema padrão (gradiente), claro ou escuro. Escolha abaixo e abra o widget.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="demo-card">
+              <CardHeader>
+                <MapPin className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Posição persistida</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  Com positionStorageKey a posição do widget é salva no localStorage.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="demo-card">
+              <CardHeader>
+                <ShieldCheck className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Acessível</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  Foco no modal, Escape para fechar, ARIA e suporte a teclado.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="demo-card">
+              <CardHeader>
+                <Zap className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Previsão e erros</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  3, 5 ou 7 dias de previsão. Callback onError e botão &quot;Tentar novamente&quot; no modal.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="demo-card">
+              <CardHeader>
+                <Cloud className="demo-card-icon" />
+                <CardTitle className="demo-card-title">Open-Meteo</CardTitle>
+                <CardDescription className="demo-card-desc">
+                  Dados gratuitos, sem chave de API. Nominatim para geocoding, com cache.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
+        <section className="demo-section demo-section-alt">
+          <h3 className="demo-section-title">Tema do modal</h3>
+          <Tabs
+            value={modalTheme}
+            onValueChange={setModalTheme}
+            className="demo-tabs"
+          >
+            <TabsList className="demo-tabs-list">
+              <TabsTrigger value="default">Padrão</TabsTrigger>
+              <TabsTrigger value="light">Claro</TabsTrigger>
+              <TabsTrigger value="dark">Escuro</TabsTrigger>
+            </TabsList>
+            <TabsContent value={modalTheme} className="demo-tabs-content">
+              <p className="text-muted-foreground text-sm">
+                Abra o widget (clique na bolinha) para ver o modal com o tema escolhido.
+              </p>
+            </TabsContent>
+          </Tabs>
+        </section>
+
+        <section className="demo-section">
+          <h3 className="demo-section-title">Como testar</h3>
+          <ol className="demo-steps">
+            <li>
+              <ChevronRight className="demo-step-icon" />
+              <span><strong>Arraste</strong> o widget para qualquer canto da tela (mouse ou dedo).</span>
+            </li>
+            <li>
+              <ChevronRight className="demo-step-icon" />
+              <span><strong>Clique</strong> ou toque para abrir o modal com detalhes e previsão.</span>
+            </li>
+            <li>
+              <ChevronRight className="demo-step-icon" />
+              <span><strong>Troque de cidade</strong> no campo de busca dentro do modal.</span>
+            </li>
+            <li>
+              <ChevronRight className="demo-step-icon" />
+              <span><strong>Recarregue a página</strong> — a posição do widget continua onde você deixou.</span>
+            </li>
+          </ol>
+        </section>
+
+        <section className="demo-section demo-section-cta">
+          <Card className="demo-cta-card">
+            <CardContent className="demo-cta-content">
+              <ThermometerSun className="demo-cta-icon" />
+              <div>
+                <h4 className="demo-cta-title">Instale no seu projeto</h4>
+                <p className="demo-cta-desc">
+                  <code>npm install tempo-plugin-br</code> — documentação e props no README do repositório.
+                </p>
+                <Button asChild variant="outline" size="sm" className="demo-cta-btn">
+                  <a
+                    href="https://github.com/Ranilson-Nascimento/tempo-plugin-br"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="size-4" />
+                    Ver no GitHub
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      <footer className="demo-footer">
+        <p>
+          Dados por <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
+          {' · '}
+          Feito com ❤️ por <a href="https://github.com/Ranilson-Nascimento" target="_blank" rel="noopener noreferrer">Ranilson Nascimento</a>
         </p>
-        <p className='text-white mb-8 opacity-90 max-w-2xl mx-auto'>
-          Veja como o widget funciona em tempo real! Arraste-o pela tela, clique para ver detalhes completos do clima.
-        </p>
+      </footer>
 
-        {/* Status da localização */}
-        <div className='bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-6 max-w-md mx-auto'>
-          <h3 className='text-lg font-semibold text-white mb-2'>📍 Status da Localização</h3>
-          <p className='text-white text-sm'>{locationStatus}</p>
-          {weatherData && (
-            <div className='mt-2 text-white text-sm'>
-              <p><strong>Cidade:</strong> {weatherData.city}</p>
-              <p><strong>Temperatura:</strong> {weatherData.temperature}°C</p>
-              <p><strong>Condição:</strong> {weatherData.description}</p>
-            </div>
-          )}
-        </div>
-
-        <div className='grid md:grid-cols-3 gap-6 mb-8'>
-          <div className='bg-white/10 backdrop-blur-sm rounded-lg p-6'>
-            <h3 className='text-xl font-semibold text-white mb-3'>🎯 Plug-and-Play</h3>
-            <p className='text-white text-sm opacity-90'>Funciona imediatamente após a instalação. Basta importar e usar!</p>
-          </div>
-
-          <div className='bg-white/10 backdrop-blur-sm rounded-lg p-6'>
-            <h3 className='text-xl font-semibold text-white mb-3'>🌍 API Brasileira</h3>
-            <p className='text-white text-sm opacity-90'>Dados meteorológicos precisos do Brasil via Open-Meteo</p>
-          </div>
-
-          <div className='bg-white/10 backdrop-blur-sm rounded-lg p-6'>
-            <h3 className='text-xl font-semibold text-white mb-3'>🎨 Totalmente Customizável</h3>
-            <p className='text-white text-sm opacity-90'>Cores, tamanho, posição e comportamento personalizáveis</p>
-          </div>
-        </div>
-
-        <div className='bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-8'>
-          <h2 className='text-2xl font-semibold text-white mb-4'>🖱️ Como Testar</h2>
-          <div className='grid md:grid-cols-2 gap-4 text-left'>
-            <div className='text-white'>
-              <h4 className='font-semibold mb-2'>1. Arrastar o Widget</h4>
-              <p className='text-sm opacity-90'>Clique e arraste a bolinha vermelha para qualquer posição na tela</p>
-            </div>
-            <div className='text-white'>
-              <h4 className='font-semibold mb-2'>2. Ver Detalhes</h4>
-              <p className='text-sm opacity-90'>Clique no widget para abrir um modal com informações completas</p>
-            </div>
-            <div className='text-white'>
-              <h4 className='font-semibold mb-2'>3. Trocar Cidade</h4>
-              <p className='text-sm opacity-90'>No modal, digite o nome de qualquer cidade brasileira</p>
-            </div>
-            <div className='text-white'>
-              <h4 className='font-semibold mb-2'>4. Atualização Automática</h4>
-              <p className='text-sm opacity-90'>Os dados se atualizam automaticamente a cada 5 minutos</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Widget real do pacote */}
-        <TempoWidget
-          initialX={100}
-          initialY={100}
-          backgroundColor='#ff6b6b'
-          textColor='#ffffff'
-          size={80}
-          updateInterval={5}
-          onTemperatureUpdate={handleTemperatureUpdate}
-          onCityChange={handleCityChange}
-        />
-
-        <div className='mt-8 text-white text-sm opacity-75 bg-black/20 rounded-lg p-4'>
-          <p className='mb-2'>💡 <strong>O que você vê no widget:</strong></p>
-          <ul className='text-left max-w-md mx-auto space-y-1'>
-            <li>• <strong>Ícone do clima</strong> (☀️, 🌧️, etc.)</li>
-            <li>• <strong>Temperatura atual</strong> em graus Celsius</li>
-            <li>• <strong>Nome da cidade</strong> (abreviado se necessário)</li>
-            <li>• <strong>Clique</strong> para ver detalhes completos em um modal flutuante</li>
-            <li>• <strong>Arraste</strong> para reposicionar em qualquer lugar da tela</li>
-          </ul>
-          <p className='mt-3 text-xs opacity-75'>Permita a localização no navegador para detectar sua cidade automaticamente!</p>
-        </div>
-
-        <div className='mt-6 text-white text-xs opacity-50'>
-          <p>Feito com ❤️ usando React, TypeScript e dados da Open-Meteo API</p>
-        </div>
-      </div>
+      <TempoWidget
+        initialX={120}
+        initialY={120}
+        positionStorageKey={DEMO_STORAGE_KEY}
+        theme={modalTheme}
+        forecastDays={5}
+        updateInterval={5}
+        size={72}
+        backgroundColor="#0f766e"
+        textColor="#ffffff"
+        onTemperatureUpdate={handleTemperatureUpdate}
+        onCityChange={handleCityChange}
+        onError={handleError}
+      />
     </div>
   );
 }

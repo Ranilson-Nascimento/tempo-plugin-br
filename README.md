@@ -2,24 +2,11 @@
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-red)](https://github.com/sponsors/Ranilson-Nascimento)
 
-Um plugin React moderno para exibir a temperatura brasileira em tempo real com componente flutuante e arrastável.
+Widget de clima em tempo real para React, focado no Brasil. Uma bolinha flutuante que você pode arrastar pela tela; ao clicar, abre um modal com temperatura, sensação térmica, previsão e busca por cidade. A localização é detectada automaticamente ou você define uma cidade inicial.
 
-## Demonstração
+**Demo:** [ranilson-nascimento.github.io/tempo-plugin-br](https://ranilson-nascimento.github.io/tempo-plugin-br/) — vale testar no celular (arraste com o dedo).
 
-Veja o plugin em ação: **[Demo Interativa](https://ranilson-nascimento.github.io/tempo-plugin-br/)**
-
-Experimente: Arraste o widget, clique para ver detalhes e teste todas as funcionalidades!
-
-## Características
-
-- Plug-and-Play: Funciona imediatamente após a instalação
-- API Brasileira: Usa APIs gratuitas e confiáveis para dados meteorológicos
-- Totalmente Customizável: Cores, tamanho e posição personalizáveis
-- Responsivo: Funciona perfeitamente em desktop e mobile
-- Arrastável: Interface intuitiva para reposicionar o widget
-- Leve e Rápido: Bundle otimizado e performance excelente
-- Atualização Automática: Dados atualizados automaticamente
-- Múltiplas Cidades: Suporte para qualquer cidade brasileira
+---
 
 ## Instalação
 
@@ -27,220 +14,158 @@ Experimente: Arraste o widget, clique para ver detalhes e teste todas as funcion
 npm install tempo-plugin-br
 ```
 
-ou
+ou com yarn:
 
 ```bash
 yarn add tempo-plugin-br
 ```
 
-## Uso Básico
+---
 
-### Importação Simples
+## Uso rápido
+
+Importe o componente e o CSS (obrigatório para o widget e o modal ficarem bonitos):
 
 ```jsx
-import React from 'react';
 import { TempoWidget } from 'tempo-plugin-br';
+import 'tempo-plugin-br/dist/index.esm.css';  // não esqueça do CSS
 
 function App() {
   return (
     <div>
-      <h1>Minha Aplicação</h1>
+      <h1>Meu app</h1>
       <TempoWidget />
     </div>
   );
 }
-
-export default App;
 ```
 
-### Uso com Customização
-
-```jsx
-import React from 'react';
-import { TempoWidget } from 'tempo-plugin-br';
-
-function App() {
-  const handleTemperatureUpdate = (data) => {
-    console.log('Nova temperatura:', data.temperature);
-  };
-
-  const handleCityChange = (city) => {
-    console.log('Cidade alterada para:', city);
-  };
-
-  return (
-    <div>
-      <TempoWidget
-        initialX={100}
-        initialY={50}
-        initialCity="São Paulo"
-        backgroundColor="#ff6b6b"
-        textColor="#ffffff"
-        size={70}
-        updateInterval={5}
-        onTemperatureUpdate={handleTemperatureUpdate}
-        onCityChange={handleCityChange}
-      />
-    </div>
-  );
-}
-
-export default App;
-```
-
-## Propriedades (Props)
-
-| Propriedade | Tipo | Padrão | Descrição |
-|-------------|------|--------|-----------|
-| `initialX` | `number` | `20` | Posição inicial X do widget |
-| `initialY` | `number` | `20` | Posição inicial Y do widget |
-| `initialCity` | `string` | `undefined` | Cidade inicial (detecta automaticamente se não especificada) |
-| `backgroundColor` | `string` | `#007bff` | Cor de fundo do widget |
-| `textColor` | `string` | `#ffffff` | Cor do texto |
-| `size` | `number` | `60` | Tamanho do widget em pixels |
-| `updateInterval` | `number` | `10` | Intervalo de atualização em minutos |
-| `onTemperatureUpdate` | `function` | `undefined` | Callback chamado quando a temperatura é atualizada |
-| `onCityChange` | `function` | `undefined` | Callback chamado quando a cidade é alterada |
-
-## Exemplos de Customização
-
-### Widget Pequeno e Discreto
-
-```jsx
-<TempoWidget
-  size={40}
-  backgroundColor="rgba(0, 0, 0, 0.7)"
-  initialX={window.innerWidth - 60}
-  initialY={20}
-/>
-```
-
-### Widget Grande e Colorido
-
-```jsx
-<TempoWidget
-  size={80}
-  backgroundColor="#e74c3c"
-  textColor="#ffffff"
-  initialX={20}
-  initialY={20}
-/>
-```
-
-### Widget com Tema Escuro
-
-```jsx
-<TempoWidget
-  backgroundColor="#2c3e50"
-  textColor="#ecf0f1"
-  size={65}
-/>
-```
-
-## Funcionalidades
-
-### Widget Flutuante
-- O widget aparece como uma bolinha flutuante na tela
-- Exibe a temperatura atual e um ícone do clima
-- Pode ser arrastado para qualquer posição na tela
-- Mantém a posição mesmo após atualizações
-
-### Modal Informativo
-- Clique no widget para abrir um modal com informações detalhadas
-- Mostra temperatura, sensação térmica, umidade, vento, pressão, visibilidade, UV, nuvens e chuva
-- Previsão de 3 dias com temperaturas máxima e mínima
-- Interface para alterar a cidade
-- Design moderno com gradientes e efeitos visuais
-
-### Detecção Automática de Localização
-- Detecta automaticamente a localização do usuário
-- Fallback para São Paulo caso a geolocalização falhe
-- Suporte para qualquer cidade brasileira
-
-## API de Dados
-
-O plugin utiliza a API gratuita **Open-Meteo** que oferece:
-- Dados meteorológicos precisos e atualizados
-- Sem necessidade de chave de API
-- Sem limites de requisições para uso não comercial
-- Suporte completo ao Brasil
-- Dados em português
-
-## Compatibilidade
-
-- React 16.8+
-- TypeScript
-- Todos os navegadores modernos
-- Mobile e Desktop
-- SSR (Server-Side Rendering)
-
-## Desenvolvimento
-
-### Clonando o Repositório
-
-```bash
-git clone https://github.com/Ranilson-Nascimento/tempo-plugin-br.git
-cd tempo-plugin-br
-npm install
-```
-
-### Scripts Disponíveis
-
-```bash
-# Desenvolvimento do pacote
-npm run dev
-
-# Build para produção
-npm run build
-
-# Executar testes
-npm test
-
-# Publicar no NPM
-npm publish
-```
-
-### Executando o Exemplo Local
-
-```bash
-# Instalar dependências do exemplo
-cd exemplo-tempo-plugin
-npm install --legacy-peer-deps
-
-# Executar servidor de desenvolvimento
-npm run dev
-```
-
-Acesse `http://localhost:5173` para ver a demonstração interativa.
-
-## Contribuição
-
-Contribuições são bem-vindas! Por favor:
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## Agradecimentos
-
-- [Open-Meteo](https://open-meteo.com/) pela API gratuita de dados meteorológicos
-- Comunidade React brasileira pelo feedback e suporte
-
-## Suporte
-
-Se você encontrar algum problema ou tiver sugestões:
-
-- Reporte bugs
-- Sugira melhorias
-- Entre em contato: ranilson.nascimento93@gmail.com
+Pronto. O widget usa a localização do navegador (se o usuário permitir) e mostra a temperatura; a cidade aparece no formato **Cidade - UF** (ex.: São Paulo - SP).
 
 ---
 
-Feito com ❤️ por [Ranilson Nascimento](https://github.com/Ranilson-Nascimento)
+## Customizando
 
+Você pode mudar posição inicial, cores, tamanho, intervalo de atualização e até o tema do modal (padrão, claro ou escuro). Exemplo:
+
+```jsx
+<TempoWidget
+  initialX={100}
+  initialY={80}
+  initialCity="Rio de Janeiro"
+  backgroundColor="#0f766e"
+  textColor="#ffffff"
+  size={70}
+  updateInterval={5}
+  theme="dark"
+  forecastDays={5}
+  onTemperatureUpdate={(data) => console.log(data.temperature)}
+  onCityChange={(city) => console.log('Cidade:', city)}
+/>
+```
+
+### Salvar a posição da bolinha
+
+Se você passar uma chave em `positionStorageKey`, a posição do widget é salva no `localStorage`. Assim, quando o usuário voltar à página, a bolinha continua onde ele deixou.
+
+```jsx
+<TempoWidget positionStorageKey="meu-app-clima-pos" />
+```
+
+### Tratar erros
+
+Em caso de falha (localização negada, rede, cidade não encontrada), você pode usar o callback `onError`:
+
+```jsx
+<TempoWidget
+  onError={(err, type) => {
+    // type: 'location' | 'weather' | 'city'
+    console.warn(type, err.message);
+  }}
+/>
+```
+
+No próprio modal existe o botão "Tentar novamente" quando algo dá errado.
+
+---
+
+## Todas as props
+
+| Prop | Tipo | Padrão | O que faz |
+|------|------|--------|-----------|
+| `initialX` | number | 20 | Posição inicial (eixo X) da bolinha em pixels |
+| `initialY` | number | 20 | Posição inicial (eixo Y) da bolinha em pixels |
+| `initialCity` | string | — | Cidade inicial. Se não informar, tenta usar a localização do navegador |
+| `backgroundColor` | string | #007bff | Cor de fundo da bolinha |
+| `textColor` | string | #ffffff | Cor do texto da bolinha |
+| `size` | number | 60 | Tamanho da bolinha em pixels |
+| `updateInterval` | number | 10 | De quantos em quantos minutos os dados são atualizados |
+| `forecastDays` | 3, 5 ou 7 | 3 | Quantos dias de previsão aparecem no modal |
+| `positionStorageKey` | string | — | Se informado, salva a posição no localStorage com essa chave |
+| `theme` | 'default' \| 'light' \| 'dark' | 'default' | Visual do modal (gradiente, claro ou escuro) |
+| `onTemperatureUpdate` | função | — | Chamada quando os dados de clima são atualizados (recebe o objeto com temperatura, cidade, etc.) |
+| `onCityChange` | função | — | Chamada quando o usuário troca de cidade no modal |
+| `onError` | função | — | Chamada em erro (recebe o erro e o tipo: 'location', 'weather' ou 'city') |
+
+---
+
+## O que o widget faz
+
+- **Bolinha:** mostra ícone do tempo, temperatura e nome da cidade (Cidade - UF). Você pode arrastar com o mouse ou com o dedo no celular.
+- **Clique (ou toque):** abre o modal com temperatura, sensação térmica, umidade, vento, pressão, UV, previsão dos próximos dias e um campo para buscar outra cidade.
+- **Localização:** se não houver `initialCity`, o plugin pede permissão de localização; se o usuário negar ou der falha, os dados usam São Paulo como fallback.
+- **Dados:** clima via [Open-Meteo](https://open-meteo.com/) (sem chave de API); nome da cidade a partir das coordenadas via [BigDataCloud](https://www.bigdatacloud.com/) (reverse geocoding, uso no navegador sem chave).
+
+---
+
+## Requisitos
+
+- React 16.8 ou superior
+- Navegadores modernos (com suporte a geolocalização e fetch)
+
+O projeto é em TypeScript e exporta os tipos. Em ambiente com SSR (Next, etc.), o widget só é montado no cliente para evitar erro com `window`/`navigator`.
+
+---
+
+## Rodar o exemplo na sua máquina
+
+Na raiz do repositório:
+
+```bash
+npm install
+npm run build
+cd exemplo-tempo-plugin
+npm install --legacy-peer-deps
+npm run dev
+```
+
+Abra `http://localhost:5173` no navegador.
+
+---
+
+## Desenvolvimento do pacote
+
+```bash
+npm install
+npm run dev    # build em modo watch
+npm run build  # gera dist/
+npm test       # testes (Jest)
+```
+
+---
+
+## Contribuir
+
+Abre uma issue para bug ou ideia, ou manda um pull request. Fork → branch → commit → push → PR.
+
+---
+
+## Licença
+
+MIT. Ver [LICENSE](LICENSE).
+
+Agradecimentos ao [Open-Meteo](https://open-meteo.com/) e ao [BigDataCloud](https://www.bigdatacloud.com/) pelos dados e APIs gratuitas.
+
+---
+
+Feito com ❤️ por [Ranilson Nascimento](https://github.com/Ranilson-Nascimento) · contato: ranilson.nascimento93@gmail.com
