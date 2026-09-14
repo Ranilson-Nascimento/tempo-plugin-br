@@ -56,4 +56,22 @@ describe('WeatherService & Utilities', () => {
 
     global.fetch = originalFetch;
   });
+
+  test('should discard cached weather if forecast is from a previous day', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+    const staleWeather: any = {
+      temperature: 20,
+      city: 'São Paulo - SP',
+      forecast: [
+        { date: yesterdayStr, tempMax: 22, tempMin: 15 }
+      ]
+    };
+
+    weatherService.saveCachedWeather(staleWeather);
+    const cached = weatherService.getCachedWeather();
+    expect(cached).toBeNull();
+  });
 });

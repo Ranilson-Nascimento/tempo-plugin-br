@@ -51,6 +51,17 @@ function getUvInfo(uv: number): { label: string; color: string; percent: number 
   return { label: 'Extremo', color: '#a855f7', percent: 100 };
 }
 
+function parseForecastDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  // Quando dateStr é "YYYY-MM-DD", 'new Date("YYYY-MM-DD")' interpreta como meia-noite UTC.
+  // Em fusos com UTC negativo (como Brasil UTC-3), isso volta para a noite do dia anterior!
+  // Adicionando 'T12:00:00' garante que a data permaneça no dia correto no fuso local.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(`${dateStr}T12:00:00`);
+  }
+  return new Date(dateStr);
+}
+
 export const TempoModal: React.FC<TempoModalProps> = ({
   weatherData,
   error,
@@ -443,7 +454,7 @@ export const TempoModal: React.FC<TempoModalProps> = ({
                   <h4 className="tempo-section-heading">Previsão dos próximos dias</h4>
                   <div className="tempo-forecast-list">
                     {weatherData.forecast.map((day, idx) => {
-                      const dayDate = new Date(day.date);
+                      const dayDate = parseForecastDate(day.date);
                       const dayName = idx === 0
                         ? 'Hoje'
                         : dayDate.toLocaleDateString('pt-BR', { weekday: 'short' });

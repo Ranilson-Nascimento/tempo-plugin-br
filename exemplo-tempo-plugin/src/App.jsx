@@ -73,7 +73,7 @@ function App() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="demo-badge-version">
-              v2.1.0 • Glass Design
+              v2.1.1 • Glass Design
             </Badge>
           </div>
         </div>

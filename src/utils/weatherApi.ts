@@ -46,6 +46,11 @@ export class WeatherService {
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (parsed && parsed.data && Date.now() - parsed.timestamp < 3 * 60 * 60 * 1000) {
+        const now = new Date();
+        const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        if (parsed.data.forecast?.[0]?.date && parsed.data.forecast[0].date < localTodayStr) {
+          return null;
+        }
         return parsed.data as WeatherData;
       }
     } catch {}

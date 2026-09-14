@@ -1,40 +1,36 @@
-# 🌤️ Tempo Plugin BR
+# tempo-plugin-br
 
 [![npm version](https://img.shields.io/npm/v/tempo-plugin-br.svg?color=blue)](https://www.npmjs.com/package/tempo-plugin-br)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-16.8%2B%20%7C%2018%20%7C%2019-61dafb.svg)](https://reactjs.org/)
-[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-red)](https://github.com/sponsors/Ranilson-Nascimento)
 
-E aí, dev! 👋 
+Componente React moderno de previsão do tempo para aplicações web brasileiras. Oferece widget flutuante arrastável, modal com métricas climáticas completas (temperatura, sensação térmica, umidade, vento, índice UV e previsão para os próximos dias) e hook headless `useTempo` para integração customizada.
 
-O **Tempo Plugin BR** é um widget de clima leve e moderno feito especialmente para aplicações React no Brasil. Sabe aquela bolinha flutuante de temperatura que você pode arrastar para qualquer canto da tela (tanto no mouse quanto no celular com o dedo) e que abre uma previsão linda ao clicar? É exatamente isso!
+Não requer cadastro de chave de API ou configuração de backend. Utiliza a infraestrutura aberta do Open-Meteo com geolocalização e geocodificação reversa para municípios brasileiros.
 
-Sem precisar cadastrar cartão, sem chave de API e sem dor de cabeça de configurar backend.
-
-👉 **Veja funcionando ao vivo:** [ranilson-nascimento.github.io/tempo-plugin-br](https://ranilson-nascimento.github.io/tempo-plugin-br/) *(dica: teste abrir no celular e arrastar com o dedo!)*
+Demonstração online: [ranilson-nascimento.github.io/tempo-plugin-br](https://ranilson-nascimento.github.io/tempo-plugin-br/)
 
 ---
 
-## ✨ Por que usar?
+## Funcionalidades
 
-- 🆓 **Zero configuração de API:** Usa dados abertos da Open-Meteo. Não precisa criar conta nem colocar token.
-- 🇧🇷 **Pensado para o Brasil:** Mostra nomes reais de municípios e siglas de estado certinhas (ex: *São Paulo - SP*, *Rio de Janeiro - RJ*, *Curitiba - PR*).
-- 🪟 **Design Glassmorphism Moderno:** Efeito de vidro fosco translúcido (*frosted glass*), micro-animações, pílula de prévia no hover e visual estilo Apple Weather.
-- ⚡ **Cache Instantâneo (SWR):** Ao recarregar a página, a temperatura aparece na hora (0ms de espera), sem aquele spinner chato piscando na tela.
-- 👆 **Totalmente Arrastável:** Funciona suave com mouse no desktop e com touch no mobile. Dá até para salvar a posição no `localStorage`.
-- 🪝 **Opção de Hook Headless (`useTempo`):** Não quer a bolinha flutuante pronta? Sem problemas! Você pode usar só o hook e montar seu próprio visual na sua navbar.
+- **Zero Configuração:** Conexão direta com a API aberta Open-Meteo, sem necessidade de tokens ou cadastro.
+- **Foco no Brasil:** Identificação precisa de cidades brasileiras com sigla de estado (ex: "Curitiba - PR", "São Paulo - SP").
+- **Design Glassmorphism:** Interface translúcida com suporte aos temas Padrão (Glass), Claro (Clean) e Escuro (OLED).
+- **Arrastável:** Suporte completo a interações com mouse e touch em dispositivos móveis, com opção de persistência da posição via `localStorage`.
+- **Cache Local (SWR):** Exibição imediata dos dados salvos localmente enquanto revalida em segundo plano, eliminando tempo de carregamento perceptível.
+- **Hook Headless (`useTempo`):** Acesso direto aos dados de clima e geolocalização para implementação de interfaces personalizadas (navbars, dashboards, etc.).
+- **Responsivo:** Adapta-se automaticamente a telas menores, exibindo o modal como uma gaveta inferior deslizante (*bottom sheet*).
 
 ---
 
-## 📦 Instalação
-
-No terminal do seu projeto:
+## Instalação
 
 ```bash
 npm install tempo-plugin-br
 ```
 
-ou se você usa Yarn / pnpm:
+Caso utilize Yarn ou pnpm:
 
 ```bash
 yarn add tempo-plugin-br
@@ -44,57 +40,56 @@ pnpm add tempo-plugin-br
 
 ---
 
-## 🚀 Como usar em 30 segundos
+## Como Usar
 
-Basta importar o componente e o arquivo de estilos (CSS):
+Basta importar o componente `TempoWidget` e o arquivo de estilos CSS:
 
 ```jsx
 import React from 'react';
 import { TempoWidget } from 'tempo-plugin-br';
-import 'tempo-plugin-br/index.css'; // Não esqueça do CSS!
+import 'tempo-plugin-br/index.css';
 
 export default function App() {
   return (
     <div>
-      <h1>Meu Aplicativo</h1>
-      
-      {/* Bolinha de clima flutuante e arrastável */}
+      <h1>Minha Aplicação</h1>
       <TempoWidget />
     </div>
   );
 }
 ```
 
-Pronto! Ao carregar a página:
-1. O widget pede permissão para pegar a localização atual do usuário.
-2. Identifica a cidade e busca o clima do dia com previsão estendida.
-3. Se o usuário não autorizar o GPS, ele não trava o app: abre por padrão em São Paulo e o usuário pode pesquisar qualquer outra cidade pelo modal.
+Ao carregar o componente:
+1. O widget solicita permissão de geolocalização do navegador para identificar a cidade atual.
+2. Caso o usuário não conceda permissão, o componente utiliza São Paulo como local padrão e permite busca manual por qualquer outro município no modal.
+3. Clicar no widget abre o modal com métricas detalhadas (sensação térmica, vento, umidade, UV, nascer/pôr do sol e previsão estendida).
 
 ---
 
-## 🪝 Quer só os dados? Use o Hook Headless (`useTempo`)
+## Hook Headless (`useTempo`)
 
-Se você já tem seu próprio design, navbar ou dashboard e só quer os dados mastigados e reativos, use o hook `useTempo`:
+Para criar uma interface própria (como um indicador na barra de navegação ou painel de controle), utilize o hook `useTempo`:
 
 ```jsx
 import React from 'react';
 import { useTempo } from 'tempo-plugin-br';
 
-export function MinhaBarraDeClima() {
+export function BarraDeClima() {
   const { weather, loading, error, setCity, refresh } = useTempo({
     initialCity: 'Curitiba',
-    enableLocalCache: true // Carrega na hora do cache local
+    enableLocalCache: true
   });
 
-  if (loading) return <span>Consultando satélite... 🛰️</span>;
-  if (error) return <span>Não foi possível carregar o clima.</span>;
+  if (loading) return <span>Carregando dados meteorológicos...</span>;
+  if (error) return <span>Erro ao obter previsão do tempo.</span>;
+  if (!weather) return null;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <span>📍 {weather.city}</span>
-      <span>{weather.icon} {weather.temperature}°C</span>
-      <button onClick={() => setCity('Rio de Janeiro')}>Ver Rio</button>
-      <button onClick={refresh} title="Atualizar agora">🔄</button>
+      <span>{weather.city}</span>
+      <span>{weather.temperature}°C</span>
+      <button onClick={() => setCity('Rio de Janeiro')}>Ver Rio de Janeiro</button>
+      <button onClick={refresh}>Atualizar</button>
     </div>
   );
 }
@@ -102,30 +97,31 @@ export function MinhaBarraDeClima() {
 
 ---
 
-## 🛠️ Exemplos Práticos de Customização
+## Exemplos de Customização
 
-### 1. Mudando cores, tamanho e tema
-Você pode combinar a bolinha com as cores da sua marca e escolher o tema do modal (`default`, `light` ou `dark`):
+### 1. Cores, tamanho e tema visual
 
 ```jsx
 <TempoWidget
-  backgroundColor="#0f766e" // Cor de fundo da bolinha
-  textColor="#ffffff"        // Cor do texto
-  size={72}                  // Diâmetro em pixels
-  theme="dark"               // Modal com tema escuro OLED
-  forecastDays={5}           // 3, 5 ou 7 dias de previsão
+  backgroundColor="#0f766e"
+  textColor="#ffffff"
+  size={72}
+  theme="dark"
+  forecastDays={5}
 />
 ```
 
-### 2. Lembrar onde o usuário deixou a bolinha
-Quer que a bolinha continue no mesmo lugar da tela quando o usuário voltar amanhã? Basta passar a prop `positionStorageKey`:
+### 2. Persistir a posição arrastada
+
+Para manter o widget na mesma posição escolhida pelo usuário entre recarregamentos de página:
 
 ```jsx
-<TempoWidget positionStorageKey="posicao-widget-meu-app" />
+<TempoWidget positionStorageKey="minha-app-widget-posicao" />
 ```
 
-### 3. Usando no Next.js (App Router)
-Como o widget depende de recursos do navegador (geolocalização e arraste interativo), adicione `'use client'` no topo do componente que o renderiza:
+### 3. Utilização com Next.js (App Router)
+
+Por utilizar APIs do navegador (`localStorage`, geolocalização e eventos de ponteiro), adicione a diretiva `'use client'` no topo do arquivo do componente que renderiza o widget:
 
 ```jsx
 'use client';
@@ -133,7 +129,7 @@ Como o widget depende de recursos do navegador (geolocalização e arraste inter
 import { TempoWidget } from 'tempo-plugin-br';
 import 'tempo-plugin-br/index.css';
 
-export default function PaginaInicial() {
+export default function HomePage() {
   return (
     <main>
       <TempoWidget />
@@ -144,113 +140,71 @@ export default function PaginaInicial() {
 
 ---
 
-## 📋 Todas as Props do `TempoWidget`
+## Propriedades do `TempoWidget`
 
-Tudo no widget tem valores padrão sensatos, então nenhuma prop é obrigatória:
-
-| Prop | Tipo | Padrão | Para que serve? |
+| Propriedade | Tipo | Padrão | Descrição |
 | :--- | :--- | :--- | :--- |
-| `initialX` | `number` | `24` | Distância inicial da esquerda da tela (em pixels). |
-| `initialY` | `number` | `24` | Distância inicial do topo da tela (em pixels). |
-| `initialCity` | `string` | `undefined` | Se quiser fixar uma cidade inicial (ex: `"Belo Horizonte"`). Se não passar, tenta o GPS. |
-| `backgroundColor` | `string` | `"#0284c7"` | Cor de fundo ou gradiente da bolinha. |
-| `textColor` | `string` | `"#ffffff"` | Cor do texto e dos ícones dentro da bolinha. |
-| `size` | `number` | `68` | Tamanho (largura e altura) da bolinha em pixels. |
-| `updateInterval` | `number` | `10` | Intervalo em minutos para reconsultar os dados automaticamente. |
-| `forecastDays` | `3 \| 5 \| 7` | `3` | Quantidade de dias futuros na previsão do modal. |
-| `positionStorageKey` | `string` | `undefined` | Chave para salvar a posição arrastada no `localStorage`. |
-| `theme` | `'default' \| 'light' \| 'dark'` | `'default'` | Tema visual do modal (vidro padrão, claro clean ou escuro OLED). |
-| `showTooltip` | `boolean` | `true` | Mostra a pílula de prévia climática quando o usuário passa o mouse por cima. |
-| `className` | `string` | `""` | Classe CSS extra para o container, caso precise de ajustes finos. |
-| `onTemperatureUpdate` | `(data) => void` | — | Callback chamado quando novos dados de clima chegam. |
-| `onCityChange` | `(city) => void` | — | Chamado quando o usuário escolhe outra cidade no modal. |
-| `onError` | `(err, type) => void`| — | Chamado em caso de falha (tipo: `'location'`, `'weather'` ou `'city'`). |
+| `initialX` | `number` | `24` | Posição horizontal inicial em pixels em relação à borda esquerda. |
+| `initialY` | `number` | `24` | Posição vertical inicial em pixels em relação à borda superior. |
+| `initialCity` | `string` | `undefined` | Cidade inicial fixa. Se não definida, utiliza a geolocalização do dispositivo. |
+| `backgroundColor` | `string` | `"#0284c7"` | Cor de fundo ou gradiente do widget flutuante. |
+| `textColor` | `string` | `"#ffffff"` | Cor do texto e ícones do widget. |
+| `size` | `number` | `68` | Diâmetro do widget em pixels (largura e altura). |
+| `updateInterval` | `number` | `10` | Intervalo de atualização automática dos dados em minutos. |
+| `forecastDays` | `3 \| 5 \| 7` | `3` | Quantidade de dias exibidos na previsão estendida do modal. |
+| `positionStorageKey` | `string` | `undefined` | Chave para persistir a posição arrastada no `localStorage`. |
+| `theme` | `'default' \| 'light' \| 'dark'` | `'default'` | Tema do modal: vidro translúcido (`default`), claro (`light`) ou escuro (`dark`). |
+| `showTooltip` | `boolean` | `true` | Exibe a pílula de prévia climática ao passar o cursor sobre o widget. |
+| `className` | `string` | `""` | Classe CSS customizada para o contêiner do componente. |
+| `onTemperatureUpdate` | `(data: WeatherData) => void` | — | Callback executado após a obtenção de novos dados climáticos. |
+| `onCityChange` | `(city: string) => void` | — | Callback executado quando o usuário altera a localidade. |
+| `onError` | `(err: Error, type: string) => void` | — | Callback executado em caso de erro de localização, busca ou rede. |
 
 ---
 
-## 🌡️ O que o Modal exibe para o usuário?
+## Informações Exibidas no Modal
 
-Ao clicar na bolinha, abre um modal completo com:
-- **Card Principal:** Temperatura em destaque, sensação térmica, data formatada em português e variação do dia (`↓ Mín • ↑ Máx`).
-- **Cards de Métricas:**
-  - 💧 **Umidade:** Porcentagem com barra de nível (avisa se o ar está seco ou ideal).
-  - 💨 **Vento:** Velocidade em km/h com **bússola direcional** (ex: `NE ↗`, `S ↓`).
-  - ☀️ **Índice UV:** Nível com barra colorida (Baixo, Moderado, Alto, Extremo).
-  - 🌧️ **Chuva:** Probabilidade de precipitação do dia.
-  - 🌅 **Sol:** Horários exatos do nascer e pôr do sol.
-- **Previsão Estendida:** Dias da semana com barrinhas de espectro térmico estilo Apple Weather.
-- **Capitais Brasileiras em 1 Clique:** Chips rápidos (*São Paulo, Rio, Curitiba, Salvador, Brasília, etc.*) para trocar de cidade num instante.
-- **Busca Aberta:** Campo para digitar qualquer município do Brasil.
-- **Botão GPS:** Atalho no cabeçalho para voltar à localização atual do usuário quando quiser.
-- **Alertas Meteorológicos:** Avisos automáticos se houver previsão de tempestades severas ou granizo.
-
----
-
-## ❓ Dúvidas Frequentes (FAQ)
-
-<details>
-<summary><b>1. Preciso pagar alguma coisa ou criar conta na Open-Meteo?</b></summary>
-<p>Não! A Open-Meteo oferece dados abertos gratuitos para uso sem necessidade de chave de API (API Key) nem cadastro.</p>
-</details>
-
-<details>
-<summary><b>2. O que acontece se o usuário negar o acesso à localização?</b></summary>
-<p>O widget não quebra nem trava seu app. Ele detecta a negação e usa São Paulo como fallback padrão amigável, permitindo que o usuário pesquise sua cidade manualmente pelo modal a qualquer hora.</p>
-</details>
-
-<details>
-<summary><b>3. Funciona em celulares e tablets?</b></summary>
-<p>Sim! O arrasto foi programado tanto para eventos de mouse quanto para eventos de toque (touch). Em telas menores de celular, o modal se transforma automaticamente em uma gaveta inferior deslizante (<i>bottom-sheet</i>) com alça de toque.</p>
-</details>
-
-<details>
-<summary><b>4. Por que preciso importar o CSS separadamente?</b></summary>
-<p>Para manter o bundle de JavaScript o mais enxuto possível e evitar conflitos com bibliotecas como Tailwind ou styled-components. Importando <code>import 'tempo-plugin-br/index.css'</code>, todos os estilos e efeitos glassmorphism ficam encapsulados e isolados com prefixos próprios (<code>.tempo-*</code>).</p>
-</details>
+O modal meteorológico reúne:
+- **Resumo Atual:** Temperatura em destaque, sensação térmica, data atual em português e variação térmica do dia (mínima e máxima).
+- **Métricas Detalhadas:**
+  - Umidade relativa do ar com indicador de nível;
+  - Velocidade e direção do vento (pontos cardeais e colaterais: N, NE, L, SE, S, SO, O, NO);
+  - Índice UV com classificação de risco e barra proporcional;
+  - Probabilidade de precipitação do dia;
+  - Horários de nascer e pôr do sol;
+  - Pressão atmosférica e visibilidade.
+- **Previsão Estendida:** Dias da semana com amplitude térmica visual (barras de espectro mínimo e máximo).
+- **Atalhos Rápidos:** Seleção rápida para capitais brasileiras e campo de busca para qualquer cidade.
+- **Botão GPS:** Retorno à localização atual com um clique.
+- **Alertas Meteorológicos:** Notificação em destaque no topo em situações de instabilidade severa ou tempestades.
 
 ---
 
-## 👨‍💻 Rodando o projeto de exemplo localmente
+## Desenvolvimento Local
 
-Se quiser clonar o repositório e testar/alterar na sua máquina:
+Para clonar e executar o ambiente de desenvolvimento local:
 
 ```bash
-# 1. Clone o repositório
+# Clone o repositório
 git clone https://github.com/Ranilson-Nascimento/tempo-plugin-br.git
 cd tempo-plugin-br
 
-# 2. Instale as dependências e compile o pacote
+# Instale dependências e compile o pacote
 npm install
 npm run build
 
-# 3. Entre na pasta da aplicação de demonstração
+# Inicie a aplicação de exemplo
 cd exemplo-tempo-plugin
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-Depois é só abrir `http://localhost:5173` no seu navegador.
+Acesse `http://localhost:5173` no navegador.
 
 ---
 
-## 🤝 Contribuindo
+## Licença
 
-Ideias, melhorias e correções são super bem-vindas!
-1. Faça um Fork do projeto.
-2. Crie uma branch com sua funcionalidade (`git checkout -b feature/minha-melhoria`).
-3. Commit suas alterações (`git commit -m 'feat: adiciona nova funcionalidade'`).
-4. Faça o push para a branch (`git push origin feature/minha-melhoria`).
-5. Abra um Pull Request.
+Distribuído sob a licença [MIT](LICENSE).
 
----
-
-## 📄 Licença
-
-Distribuído sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-<p align="center">
-  Feito com ❤️ por <b><a href="https://github.com/Ranilson-Nascimento">Ranilson Nascimento</a></b><br>
-  Dúvidas ou sugestões? Sinta-se à vontade para abrir uma issue!
-</p>
+Desenvolvido por [Ranilson Nascimento](https://github.com/Ranilson-Nascimento).
