@@ -1,4 +1,4 @@
-import { WeatherData, GeoLocation, ApiResponse } from '../types';
+import { WeatherData, GeoLocation, ApiResponse, WeatherAlert } from '../types';
 
 const WEATHER_CODES: { [key: number]: { description: string; icon: string } } = {
   0: { description: 'Céu limpo', icon: '☀️' },
@@ -30,12 +30,33 @@ export class WeatherService {
   private cityNameCache: Map<string, { name: string; timestamp: number }> = new Map();
   private readonly CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
   private readonly CITY_CACHE_DURATION = 60 * 60 * 1000; // 1 hora
+  private readonly LOCAL_STORAGE_KEY = 'tempo-plugin-br-cached-weather';
 
   static getInstance(): WeatherService {
     if (!WeatherService.instance) {
       WeatherService.instance = new WeatherService();
     }
     return WeatherService.instance;
+  }
+
+  getCachedWeather(): WeatherData | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.data && Date.now() - parsed.timestamp < 3 * 60 * 60 * 1000) {
+        return parsed.data as WeatherData;
+      }
+    } catch {}
+    return null;
+  }
+
+  saveCachedWeather(data: WeatherData): void {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch {}
   }
 
   async getCurrentLocation(): Promise<GeoLocation> {
@@ -65,6 +86,15 @@ export class WeatherService {
     });
   }
 
+  private sanitizeCityName(rawName: string): string {
+    if (!rawName) return '';
+    return rawName
+      .replace(/^regi[aã]o\s+(metropolitana|geogr[aá]fica\s+(imediata|intermedi[aá]ria)?|integrada(\s+de\s+desenvolvimento)?)?\s*(de\s+|do\s+|da\s+)?/i, '')
+      .replace(/^microrregi[aã]o\s*(de\s+|do\s+|da\s+)?/i, '')
+      .replace(/^mesorregi[aã]o\s*(de\s+|do\s+|da\s+)?/i, '')
+      .trim();
+  }
+
   async getCityNameFromCoordinates(location: GeoLocation): Promise<string> {
     const cacheKey = `${location.latitude},${location.longitude}`;
     const cached = this.cityNameCache.get(cacheKey);
@@ -77,11 +107,26 @@ export class WeatherService {
       );
       if (!response.ok) throw new Error('Erro ao buscar nome da cidade');
       const data = await response.json();
-      const city = data?.city || data?.locality;
+
+      // No Brasil, locality geralmente é o município exato (ex: "São Paulo"),
+      // enquanto city muitas vezes vem como "Região Metropolitana de São Paulo".
+      let cityName = '';
+      if (data?.locality && !/^regi[aã]o/i.test(data.locality)) {
+        cityName = data.locality;
+      } else if (data?.city) {
+        cityName = this.sanitizeCityName(data.city);
+      } else if (data?.locality) {
+        cityName = this.sanitizeCityName(data.locality);
+      }
+
+      if (!cityName && data?.principalSubdivision) {
+        cityName = data.principalSubdivision;
+      }
+
       const code = data?.principalSubdivisionCode; // ex: "BR-SP" -> UF "SP"
       const uf = code && /^BR-/i.test(code) ? code.replace(/^BR-/i, '') : (data?.principalSubdivision || '');
       const name =
-        city && uf ? `${city} - ${uf}` : city || data?.locality || 'Cidade Desconhecida';
+        cityName && uf ? `${cityName} - ${uf}` : cityName || 'Cidade Desconhecida';
       this.cityNameCache.set(cacheKey, { name, timestamp: Date.now() });
       return name;
     } catch (error) {
@@ -163,6 +208,33 @@ export class WeatherService {
         cloudCoverValue = Math.round(nextHours.reduce((sum, val) => sum + val, 0) / nextHours.length);
       }
 
+      let alert: WeatherAlert | undefined;
+      if (weatherCode === 99) {
+        alert = {
+          title: 'Alerta de Tempestade Severa',
+          message: 'Tempestade com granizo intenso prevista para esta região.',
+          severity: 'danger'
+        };
+      } else if (weatherCode === 96) {
+        alert = {
+          title: 'Alerta de Tempestade com Granizo',
+          message: 'Tempestade com risco de queda de granizo nas próximas horas.',
+          severity: 'danger'
+        };
+      } else if (weatherCode === 95) {
+        alert = {
+          title: 'Alerta de Tempestade',
+          message: 'Instabilidade com raios e trovoadas nesta região.',
+          severity: 'warning'
+        };
+      } else if (weatherCode === 82 || weatherCode === 65) {
+        alert = {
+          title: 'Alerta de Chuva Forte',
+          message: 'Pancadas de chuva intensas com risco de alagamentos pontuais.',
+          severity: 'warning'
+        };
+      }
+
       const weatherData: WeatherData = {
         temperature: Math.round(data.current_weather.temperature),
         description: weatherInfo.description,
@@ -180,10 +252,14 @@ export class WeatherService {
         precipitationProbability: data.daily?.precipitation_probability_max?.[0] || 0, // Probabilidade máxima do dia
         sunrise: data.daily?.sunrise?.[0],
         sunset: data.daily?.sunset?.[0],
-        forecast: forecast
+        forecast: forecast,
+        tempMax: data.daily?.temperature_2m_max?.[0] != null ? Math.round(data.daily.temperature_2m_max[0]) : Math.round(data.current_weather.temperature),
+        tempMin: data.daily?.temperature_2m_min?.[0] != null ? Math.round(data.daily.temperature_2m_min[0]) : Math.round(data.current_weather.temperature),
+        alert
       };
 
       this.cache.set(cacheKey, { data: weatherData, timestamp: Date.now() });
+      this.saveCachedWeather(weatherData);
       return weatherData;
     } catch (error) {
       console.error('Erro ao buscar dados meteorológicos:', error);

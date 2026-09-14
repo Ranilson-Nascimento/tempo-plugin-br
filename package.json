@@ -1,6 +1,6 @@
 {
   "name": "tempo-plugin-br",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "description": "Plugin React para exibir temperatura brasileira em tempo real com componente flutuante e arrastável",
   "main": "dist/index.cjs",
@@ -12,7 +12,10 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.esm.js"
-    }
+    },
+    "./index.css": "./dist/index.esm.css",
+    "./dist/index.esm.css": "./dist/index.esm.css",
+    "./dist/index.css": "./dist/index.css"
   },
   "sideEffects": ["*.css"],
   "files": [

@@ -1,69 +1,99 @@
+.tempo-modal-overlay,
+.tempo-modal-overlay * {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 .tempo-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(4, 8, 18, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 16px;
-  animation: tempo-fadeIn 0.2s ease-out;
+  animation: tempo-overlay-in 0.25s ease-out;
 }
 
-@keyframes tempo-fadeIn {
+@keyframes tempo-overlay-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* Base Modal Container */
 .tempo-modal {
-  --tempo-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  --tempo-bg-card: rgba(255, 255, 255, 0.1);
-  --tempo-text: #fff;
-  --tempo-text-muted: rgba(255, 255, 255, 0.85);
-  --tempo-border: rgba(255, 255, 255, 0.15);
-  --tempo-input-bg: rgba(255, 255, 255, 0.15);
-  --tempo-input-focus: rgba(255, 255, 255, 0.25);
-  --tempo-accent: #fda4af;
+  --tempo-bg: radial-gradient(ellipse at 80% 0%, rgba(99, 102, 241, 0.35) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 90%, rgba(168, 85, 247, 0.25) 0%, transparent 60%),
+              linear-gradient(165deg, #181c3b 0%, #0d1226 100%);
+  --tempo-bg-card: rgba(255, 255, 255, 0.07);
+  --tempo-bg-card-hover: rgba(255, 255, 255, 0.11);
+  --tempo-border: rgba(255, 255, 255, 0.14);
+  --tempo-border-subtle: rgba(255, 255, 255, 0.08);
+  --tempo-text: #ffffff;
+  --tempo-text-muted: rgba(255, 255, 255, 0.72);
+  --tempo-text-sub: rgba(255, 255, 255, 0.52);
+  --tempo-accent: #38bdf8;
+  --tempo-input-bg: rgba(255, 255, 255, 0.09);
+  --tempo-input-focus: rgba(255, 255, 255, 0.16);
+
   background: var(--tempo-bg);
-  border-radius: 24px;
-  padding: 0;
-  max-width: 360px;
+  border-radius: 28px;
+  max-width: 440px;
   width: 100%;
-  max-height: 85vh;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 30px 65px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px var(--tempo-border),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
   color: var(--tempo-text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  animation: tempo-modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: tempo-modal-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
+/* Light Theme */
 .tempo-modal--light {
-  --tempo-bg: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
-  --tempo-bg-card: rgba(0, 0, 0, 0.06);
-  --tempo-text: #1e293b;
+  --tempo-bg: radial-gradient(ellipse at 80% 0%, rgba(56, 189, 248, 0.18) 0%, transparent 60%),
+              radial-gradient(ellipse at 10% 90%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+              linear-gradient(165deg, #ffffff 0%, #f1f5f9 100%);
+  --tempo-bg-card: rgba(0, 0, 0, 0.04);
+  --tempo-bg-card-hover: rgba(0, 0, 0, 0.07);
+  --tempo-border: rgba(0, 0, 0, 0.09);
+  --tempo-border-subtle: rgba(0, 0, 0, 0.05);
+  --tempo-text: #0f172a;
   --tempo-text-muted: #475569;
-  --tempo-border: rgba(0, 0, 0, 0.1);
-  --tempo-input-bg: rgba(0, 0, 0, 0.08);
-  --tempo-input-focus: rgba(0, 0, 0, 0.12);
-  --tempo-accent: #dc2626;
+  --tempo-text-sub: #64748b;
+  --tempo-accent: #0284c7;
+  --tempo-input-bg: rgba(0, 0, 0, 0.05);
+  --tempo-input-focus: rgba(0, 0, 0, 0.09);
 }
 
+/* Dark Theme (OLED / Midnight) */
 .tempo-modal--dark {
-  --tempo-bg: linear-gradient(160deg, #1e1b4b 0%, #312e81 50%, #1e293b 100%);
-  --tempo-bg-card: rgba(255, 255, 255, 0.06);
-  --tempo-text: #f1f5f9;
-  --tempo-text-muted: rgba(255, 255, 255, 0.8);
-  --tempo-border: rgba(255, 255, 255, 0.12);
-  --tempo-input-bg: rgba(255, 255, 255, 0.1);
-  --tempo-input-focus: rgba(255, 255, 255, 0.18);
-  --tempo-accent: #fda4af;
+  --tempo-bg: radial-gradient(ellipse at 70% -20%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+              radial-gradient(ellipse at 10% 110%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+              linear-gradient(165deg, #080c14 0%, #030712 100%);
+  --tempo-bg-card: rgba(255, 255, 255, 0.05);
+  --tempo-bg-card-hover: rgba(255, 255, 255, 0.08);
+  --tempo-border: rgba(255, 255, 255, 0.1);
+  --tempo-border-subtle: rgba(255, 255, 255, 0.06);
+  --tempo-text: #f8fafc;
+  --tempo-text-muted: rgba(255, 255, 255, 0.7);
+  --tempo-text-sub: rgba(255, 255, 255, 0.45);
+  --tempo-accent: #60a5fa;
+  --tempo-input-bg: rgba(255, 255, 255, 0.07);
+  --tempo-input-focus: rgba(255, 255, 255, 0.14);
 }
 
-@keyframes tempo-modalIn {
+@keyframes tempo-modal-in {
   from {
     opacity: 0;
-    transform: translateY(-16px) scale(0.96);
+    transform: translateY(16px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -71,384 +101,801 @@
   }
 }
 
+/* Mobile drag indicator handle */
+.tempo-modal-drag-handle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  background: var(--tempo-border);
+  border-radius: 9999px;
+  margin: 10px auto 4px;
+}
+
+/* Header */
 .tempo-modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--tempo-border);
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--tempo-border-subtle);
   background: var(--tempo-bg-card);
+  gap: 12px;
+}
+
+.tempo-modal-header-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.tempo-modal-pin-icon {
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.tempo-modal-city-box {
+  min-width: 0;
+  flex: 1;
 }
 
 .tempo-modal-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: -0.02em;
 }
 
-.tempo-modal-close {
-  background: none;
-  border: none;
-  color: var(--tempo-text);
-  font-size: 22px;
+.tempo-modal-uf-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--tempo-accent);
+  padding: 2px 6px;
+  border-radius: 6px;
   line-height: 1;
-  cursor: pointer;
-  padding: 6px;
-  width: 32px;
-  height: 32px;
+}
+
+.tempo-modal-live-status {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  transition: background 0.2s ease, transform 0.15s ease;
-  opacity: 0.9;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--tempo-text-sub);
+  margin-top: 3px;
 }
 
-.tempo-modal-close:hover {
+.tempo-modal-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.tempo-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tempo-modal-icon-btn,
+.tempo-modal-close-btn {
   background: var(--tempo-input-bg);
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-.tempo-modal-close:focus-visible {
-  outline: 2px solid var(--tempo-text);
-  outline-offset: 2px;
-}
-
-.tempo-modal-content {
-  padding: 20px;
-  overflow-y: auto;
-  max-height: calc(85vh - 70px);
-}
-
-.tempo-modal-error-block {
-  text-align: center;
-  padding: 24px 16px;
-}
-
-.tempo-modal-error-text {
-  margin: 0 0 16px 0;
-  color: var(--tempo-text-muted);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.tempo-modal-retry {
+  border: 1px solid var(--tempo-border);
+  color: var(--tempo-text);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  background: var(--tempo-input-focus);
-  color: var(--tempo-text);
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.tempo-modal-retry:hover:not(:disabled) {
-  background: var(--tempo-input-bg);
-  transform: translateY(-1px);
+.tempo-modal-icon-btn:hover,
+.tempo-modal-close-btn:hover {
+  background: var(--tempo-input-focus);
+  transform: scale(1.08);
 }
 
-.tempo-modal-retry:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.tempo-modal-retry:focus-visible {
-  outline: 2px solid var(--tempo-text);
+.tempo-modal-icon-btn:focus-visible,
+.tempo-modal-close-btn:focus-visible {
+  outline: 2px solid var(--tempo-accent);
   outline-offset: 2px;
 }
 
-.tempo-modal-hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 16px;
+/* Modal Content Scroll Area */
+.tempo-modal-content {
+  padding: 20px 22px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tempo-border) transparent;
 }
 
-.tempo-modal-hero-main {
+.tempo-modal-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.tempo-modal-content::-webkit-scrollbar-thumb {
+  background: var(--tempo-border);
+  border-radius: 4px;
+}
+
+/* Weather Alert Banner */
+.tempo-alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: tempo-modal-in 0.3s ease-out;
+}
+
+.tempo-alert-banner--warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.tempo-alert-banner--danger {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.tempo-modal--light .tempo-alert-banner--warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #b45309;
+}
+
+.tempo-modal--light .tempo-alert-banner--danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #b91c1c;
+}
+
+.tempo-alert-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tempo-alert-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tempo-alert-title {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+.tempo-alert-message {
+  opacity: 0.95;
+}
+
+/* Hero Clima Atual Card */
+.tempo-hero-card {
+  background: var(--tempo-bg-card);
+  border: 1px solid var(--tempo-border);
+  border-radius: 20px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.15);
+}
+
+.tempo-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.tempo-hero-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--tempo-input-bg);
+  border: 1px solid var(--tempo-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.tempo-hero-weather-icon {
+  font-size: 34px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+  animation: tempo-float 4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.tempo-hero-temp-block {
   flex: 1;
   min-width: 0;
 }
 
-.tempo-temperature {
-  font-size: 38px;
-  font-weight: 700;
+.tempo-hero-temp {
+  font-size: 42px;
+  font-weight: 800;
   line-height: 1;
-  margin: 0 0 4px 0;
-  letter-spacing: -0.03em;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.04em;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
 }
 
-.tempo-description {
-  font-size: 14px;
-  margin: 0;
+.tempo-hero-unit {
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 2px;
   color: var(--tempo-text-muted);
+}
+
+.tempo-hero-desc {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tempo-text-muted);
+  text-transform: capitalize;
+}
+
+.tempo-hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tempo-hero-pill {
+  background: var(--tempo-input-bg);
+  border: 1px solid var(--tempo-border-subtle);
+  border-radius: 10px;
+  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.tempo-pill-label {
+  color: var(--tempo-text-sub);
   font-weight: 500;
 }
 
-.tempo-modal-hero-feels {
-  text-align: right;
-  flex-shrink: 0;
+.tempo-pill-val {
+  font-weight: 700;
+  color: var(--tempo-text);
 }
 
-.tempo-feels-label {
-  display: block;
+.tempo-text-min {
+  color: #38bdf8;
+}
+
+.tempo-text-max {
+  color: #f87171;
+}
+
+.tempo-hero-pill-date {
+  margin-left: auto;
   font-size: 11px;
-  color: var(--tempo-text-muted);
-  margin-bottom: 2px;
+  color: var(--tempo-text-sub);
+  text-transform: capitalize;
+}
+
+/* Sections */
+.tempo-section-heading {
+  margin: 0 0 10px 2px;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  color: var(--tempo-text-sub);
 }
 
-.tempo-feels-value {
-  font-size: 17px;
-  font-weight: 600;
+/* Metrics Section & Grid */
+.tempo-metrics-section {
+  margin-bottom: 20px;
 }
 
-.tempo-details {
+.tempo-metrics-grid {
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-bottom: 18px;
-  padding: 14px;
+}
+
+.tempo-metric-card {
   background: var(--tempo-bg-card);
+  border: 1px solid var(--tempo-border);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
-}
-
-.tempo-details-grid {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.tempo-detail-item {
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.tempo-metric-card:hover {
+  background: var(--tempo-bg-card-hover);
+  transform: translateY(-2px);
+}
+
+.tempo-metric-top {
+  display: flex;
   align-items: center;
-  text-align: center;
-  padding: 8px 6px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  transition: transform 0.2s ease;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
-.tempo-detail-item:hover {
-  transform: translateY(-1px);
+.tempo-metric-icon {
+  font-size: 14px;
 }
 
-.tempo-detail-label {
-  font-size: 10px;
-  color: var(--tempo-text-muted);
-  margin-bottom: 4px;
-  font-weight: 500;
+.tempo-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tempo-text-sub);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
 
-.tempo-detail-value {
-  font-size: 13px;
-  font-weight: 600;
+.tempo-metric-value {
+  font-size: 19px;
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
-.tempo-detail-value-small {
+.tempo-metric-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tempo-text-muted);
+}
+
+/* Progress bar inside cards */
+.tempo-metric-bar-track {
+  width: 100%;
+  height: 4px;
+  background: var(--tempo-input-bg);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.tempo-metric-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease-out;
+}
+
+.tempo-metric-bar--blue {
+  background: linear-gradient(90deg, #38bdf8 0%, #60a5fa 100%);
+}
+
+.tempo-metric-bar--cyan {
+  background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
+}
+
+.tempo-metric-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
+  font-weight: 600;
+  color: var(--tempo-accent);
+  margin-bottom: 4px;
 }
 
-.tempo-forecast-strip {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+.tempo-wind-arrow {
+  font-size: 13px;
+  font-weight: bold;
 }
 
-.tempo-forecast-card {
+.tempo-metric-sub {
+  font-size: 10.5px;
+  color: var(--tempo-text-sub);
+  font-weight: 500;
+}
+
+/* Sol (Nascer & Pôr) */
+.tempo-sun-card {
   background: var(--tempo-bg-card);
-  border-radius: 12px;
-  padding: 10px 8px;
-  text-align: center;
-  min-width: 64px;
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s ease;
+  border: 1px solid var(--tempo-border);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 20px;
 }
 
-.tempo-forecast-card:hover {
-  transform: translateY(-2px);
+.tempo-sun-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tempo-sun-icon {
+  font-size: 22px;
+}
+
+.tempo-sun-title {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--tempo-text-sub);
+  letter-spacing: 0.03em;
+}
+
+.tempo-sun-time {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tempo-text);
+}
+
+.tempo-sun-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--tempo-border);
+}
+
+/* Previsão dos Próximos Dias */
+.tempo-forecast-section {
+  margin-bottom: 20px;
+}
+
+.tempo-forecast-list {
+  background: var(--tempo-bg-card);
+  border: 1px solid var(--tempo-border);
+  border-radius: 18px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tempo-forecast-row {
+  display: flex;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--tempo-border-subtle);
+  gap: 12px;
+}
+
+.tempo-forecast-row:last-child {
+  border-bottom: none;
+}
+
+.tempo-forecast-day-box {
+  width: 62px;
+  display: flex;
+  flex-direction: column;
 }
 
 .tempo-forecast-day-name {
-  font-size: 10px;
-  color: var(--tempo-text-muted);
-  margin-bottom: 4px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: capitalize;
 }
 
+.tempo-forecast-day-date {
+  font-size: 10.5px;
+  color: var(--tempo-text-sub);
+}
+
+.tempo-forecast-weather-box {
+  width: 58px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .tempo-forecast-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
+  font-size: 18px;
   line-height: 1;
 }
 
-.tempo-forecast-temps {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  align-items: baseline;
+.tempo-forecast-rain-pill {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #38bdf8;
 }
 
-.tempo-forecast-max {
+.tempo-forecast-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tempo-forecast-temp-min {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tempo-text-muted);
+  width: 24px;
+  text-align: right;
+}
+
+.tempo-forecast-temp-max {
   font-size: 13px;
   font-weight: 700;
-  color: var(--tempo-accent);
+  color: var(--tempo-text);
+  width: 24px;
 }
 
-.tempo-forecast-min {
-  font-size: 11px;
+.tempo-forecast-spectrum-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--tempo-input-bg);
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tempo-forecast-spectrum-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #38bdf8 0%, #fbbf24 60%, #f87171 100%);
+  border-radius: 9999px;
+}
+
+/* Busca e Chips de Cidades */
+.tempo-search-section {
+  margin-bottom: 8px;
+}
+
+.tempo-city-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tempo-city-chip {
+  background: var(--tempo-input-bg);
+  border: 1px solid var(--tempo-border-subtle);
   color: var(--tempo-text-muted);
-  font-weight: 500;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tempo-city-chip:hover {
+  background: var(--tempo-input-focus);
+  color: var(--tempo-text);
+  transform: translateY(-1px);
+}
+
+.tempo-city-chip--active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: var(--tempo-accent);
 }
 
 .tempo-city-form {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+}
+
+.tempo-city-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.tempo-search-input-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .tempo-city-input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 14px;
-  border: none;
+  width: 100%;
+  padding: 10px 32px 10px 36px;
+  border: 1px solid var(--tempo-border);
   border-radius: 12px;
   background: var(--tempo-input-bg);
   color: var(--tempo-text);
-  font-size: 14px;
+  font-size: 13.5px;
   outline: none;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .tempo-city-input::placeholder {
-  color: var(--tempo-text-muted);
+  color: var(--tempo-text-sub);
 }
 
 .tempo-city-input:focus {
   background: var(--tempo-input-focus);
-  box-shadow: 0 0 0 2px var(--tempo-border);
+  border-color: var(--tempo-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.tempo-city-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--tempo-text-sub);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px;
 }
 
 .tempo-city-button {
-  padding: 10px 14px;
-  border: none;
+  padding: 10px 18px;
+  border: 1px solid var(--tempo-border);
   border-radius: 12px;
-  background: var(--tempo-input-focus);
-  color: var(--tempo-text);
-  font-size: 16px;
-  font-weight: 600;
+  background: var(--tempo-accent);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
-  min-width: 44px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+}
+
+.tempo-modal--light .tempo-city-button {
+  color: #ffffff;
+  background: #0284c7;
 }
 
 .tempo-city-button:hover:not(:disabled) {
-  background: var(--tempo-input-bg);
+  opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
 }
 
 .tempo-city-button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.tempo-city-button:focus-visible {
-  outline: 2px solid var(--tempo-text);
-  outline-offset: 2px;
+.tempo-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: tempo-spin 0.8s linear infinite;
 }
 
+/* Error state block */
+.tempo-modal-error-box {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.tempo-modal-error-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.tempo-modal-error-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.tempo-modal-error-desc {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  color: var(--tempo-text-muted);
+}
+
+.tempo-modal-retry-btn {
+  padding: 10px 22px;
+  border: 1px solid var(--tempo-border);
+  border-radius: 12px;
+  background: var(--tempo-input-focus);
+  color: var(--tempo-text);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tempo-modal-retry-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--tempo-bg-card-hover);
+}
+
+/* Footer */
+.tempo-modal-footer {
+  padding: 10px 22px 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--tempo-text-sub);
+  border-top: 1px solid var(--tempo-border-subtle);
+  background: var(--tempo-bg-card);
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 480px) {
   .tempo-modal-overlay {
-    padding: 12px;
+    padding: 0;
     align-items: flex-end;
   }
 
   .tempo-modal {
     max-width: 100%;
-    max-height: 90vh;
-    border-radius: 24px 24px 0 0;
+    max-height: 92vh;
+    border-radius: 26px 26px 0 0;
+    border-bottom: none;
+  }
+
+  .tempo-modal-drag-handle {
+    display: block;
   }
 
   .tempo-modal-header {
-    padding: 16px 18px;
-  }
-
-  .tempo-modal-title {
-    font-size: 17px;
+    padding: 12px 18px 12px;
   }
 
   .tempo-modal-content {
-    padding: 18px;
+    padding: 16px 18px 24px;
   }
 
-  .tempo-temperature {
-    font-size: 34px;
+  .tempo-hero-temp {
+    font-size: 36px;
   }
 
-  .tempo-details-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 12px;
+  .tempo-hero-icon-wrap {
+    width: 56px;
+    height: 56px;
   }
 
-  .tempo-forecast-strip {
-    gap: 6px;
-  }
-
-  .tempo-forecast-card {
-    min-width: 58px;
-    padding: 8px 6px;
-  }
-
-  .tempo-forecast-icon {
-    font-size: 18px;
-  }
-
-  .tempo-forecast-max {
-    font-size: 12px;
-  }
-
-  .tempo-forecast-min {
-    font-size: 10px;
-  }
-}
-
-@media (max-width: 360px) {
-  .tempo-modal-content {
-    padding: 16px;
-  }
-
-  .tempo-temperature {
+  .tempo-hero-weather-icon {
     font-size: 30px;
   }
 
-  .tempo-details-grid {
-    grid-template-columns: 1fr;
+  .tempo-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
-  .tempo-detail-item {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
+  .tempo-metric-card {
     padding: 10px 12px;
   }
 
-  .tempo-detail-label {
-    margin-bottom: 0;
+  .tempo-metric-value {
+    font-size: 17px;
   }
 }

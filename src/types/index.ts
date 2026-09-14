@@ -16,6 +16,36 @@ export interface WeatherData {
   sunrise?: string;
   sunset?: string;
   forecast?: DailyForecast[];
+  tempMax?: number;
+  tempMin?: number;
+  alert?: WeatherAlert;
+}
+
+export interface WeatherAlert {
+  title: string;
+  message: string;
+  severity: 'warning' | 'danger';
+}
+
+export interface UseTempoOptions {
+  initialCity?: string;
+  forecastDays?: 3 | 5 | 7;
+  updateInterval?: number;
+  enableLocalCache?: boolean;
+  onTemperatureUpdate?: (data: WeatherData) => void;
+  onCityChange?: (city: string) => void;
+  onError?: (error: Error, type: TempoErrorType) => void;
+}
+
+export interface UseTempoReturn {
+  weather: WeatherData | null;
+  loading: boolean;
+  isRefreshing: boolean;
+  error: string | null;
+  city: string | null;
+  refresh: () => Promise<void>;
+  setCity: (cityName: string) => Promise<void>;
+  resetLocation: () => Promise<void>;
 }
 
 export interface DailyForecast {
@@ -43,6 +73,8 @@ export interface TempoPluginProps {
   forecastDays?: 3 | 5 | 7;
   positionStorageKey?: string | null;
   theme?: TempoTheme;
+  showTooltip?: boolean;
+  className?: string;
   onTemperatureUpdate?: (data: WeatherData) => void;
   onCityChange?: (city: string) => void;
   onError?: (error: Error, type: TempoErrorType) => void;

@@ -24,26 +24,47 @@ function savePosition(key: string, x: number, y: number): void {
   } catch {}
 }
 
+function getCleanCityName(fullCity: string): string {
+  if (!fullCity) return '';
+  const base = fullCity.split('-')[0].trim();
+  return base
+    .replace(/^regi[aã]o\s+(metropolitana|geogr[aá]fica\s+(imediata|intermedi[aá]ria)?|integrada(\s+de\s+desenvolvimento)?)?\s*(de\s+|do\s+|da\s+)?/i, '')
+    .replace(/^microrregi[aã]o\s*(de\s+|do\s+|da\s+)?/i, '')
+    .replace(/^mesorregi[aã]o\s*(de\s+|do\s+|da\s+)?/i, '')
+    .trim();
+}
+
 export const TempoWidget: React.FC<TempoPluginProps> = ({
-  initialX = 20,
-  initialY = 20,
+  initialX = 24,
+  initialY = 24,
   initialCity,
-  backgroundColor = '#007bff',
+  backgroundColor = '#0284c7',
   textColor = '#ffffff',
-  size = 60,
+  size = 68,
   updateInterval = 10,
   forecastDays = 3,
   positionStorageKey,
   theme = 'default',
+  showTooltip = true,
+  className = '',
   onTemperatureUpdate,
   onCityChange,
   onError
 }) => {
+  const weatherService = WeatherService.getInstance();
   const [mounted, setMounted] = useState(false);
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(() => {
+    const cached = weatherService.getCachedWeather();
+    if (cached && (!initialCity || cached.city.toLowerCase().includes(initialCity.toLowerCase()))) {
+      return cached;
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(!weatherData);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  
   const initialPos = { x: initialX, y: initialY };
   const storedPos = positionStorageKey
     ? loadStoredPosition(positionStorageKey, initialPos)
@@ -52,9 +73,8 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [currentCity, setCurrentCity] = useState<string | null>(initialCity ?? null);
   const dragStart = useRef({ x: 0, y: 0 });
+  const hasMoved = useRef(false);
   const lastTouchId = useRef<number | null>(null);
-
-  const weatherService = WeatherService.getInstance();
 
   useEffect(() => {
     setMounted(true);
@@ -62,7 +82,7 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
 
   const fetchWeatherData = useCallback(async () => {
     try {
-      setLoading(true);
+      if (!weatherData) setLoading(true);
       setError(null);
       let data: WeatherData;
       if (currentCity) {
@@ -75,38 +95,56 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
       onTemperatureUpdate?.(data);
     } catch (err) {
       const errObj = err instanceof Error ? err : new Error(String(err));
-      setError(errObj.message);
+      if (!weatherData) setError(errObj.message);
       const errorType: TempoErrorType = currentCity ? 'city' : 'weather';
       onError?.(errObj, errorType);
-      console.error('Erro ao buscar dados meteorol\u00F3gicos:', err);
+      console.error('Erro ao buscar dados meteorológicos:', err);
     } finally {
       setLoading(false);
     }
-  }, [currentCity, forecastDays, weatherService, onTemperatureUpdate, onError]);
+  }, [currentCity, forecastDays, weatherService, weatherData, onTemperatureUpdate, onError]);
 
   const handleCityChange = useCallback(
     async (newCity: string) => {
       try {
         setLoading(true);
         setError(null);
-        setShowModal(false);
         const data = await weatherService.getWeatherByCity(newCity, forecastDays);
         setWeatherData(data);
         setCurrentCity(newCity);
         onCityChange?.(newCity);
         onTemperatureUpdate?.(data);
-        setTimeout(() => setShowModal(true), 100);
       } catch (err) {
         const errObj = err instanceof Error ? err : new Error(String(err));
         setError(errObj.message);
         onError?.(errObj, 'city');
-        setTimeout(() => setShowModal(true), 100);
       } finally {
         setLoading(false);
       }
     },
     [forecastDays, weatherService, onCityChange, onTemperatureUpdate, onError]
   );
+
+  const handleResetLocation = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setCurrentCity(null);
+      const location = await weatherService.getCurrentLocation();
+      const data = await weatherService.getWeatherData(location, undefined, forecastDays);
+      setWeatherData(data);
+      onTemperatureUpdate?.(data);
+      if (data.city) {
+        onCityChange?.(data.city);
+      }
+    } catch (err) {
+      const errObj = err instanceof Error ? err : new Error(String(err));
+      setError(errObj.message);
+      onError?.(errObj, 'location');
+    } finally {
+      setLoading(false);
+    }
+  }, [forecastDays, weatherService, onCityChange, onTemperatureUpdate, onError]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -139,6 +177,7 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
     (clientX: number, clientY: number) => {
       if (loading) return;
       setIsDragging(true);
+      hasMoved.current = false;
       dragStart.current = { x: clientX - position.x, y: clientY - position.y };
     },
     [loading, position.x, position.y]
@@ -146,20 +185,25 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      if (e.button !== 0) return; // Only primary mouse button
       e.preventDefault();
       startDrag(e.clientX, e.clientY);
       let active = true;
+
       const onMouseMove = (ev: MouseEvent) => {
         if (!active) return;
+        hasMoved.current = true;
         applyPosition(ev.clientX, ev.clientY);
       };
+
       const onMouseUp = () => {
         active = false;
-        setIsDragging(false);
+        setTimeout(() => setIsDragging(false), 50);
         savePositionIfNeeded();
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
       };
+
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
     },
@@ -180,7 +224,7 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
     (e: React.TouchEvent) => {
       const touch = Array.from(e.changedTouches).find((t) => t.identifier === lastTouchId.current);
       if (touch) {
-        e.preventDefault();
+        hasMoved.current = true;
         applyPosition(touch.clientX, touch.clientY);
       }
     },
@@ -189,19 +233,21 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
 
   const handleTouchEnd = useCallback(() => {
     lastTouchId.current = null;
-    setIsDragging(false);
+    setTimeout(() => setIsDragging(false), 50);
     savePositionIfNeeded();
   }, [savePositionIfNeeded]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
-      if (isDragging) {
+      if (hasMoved.current) {
         e.preventDefault();
         return;
       }
-      if (!loading) setShowModal(true);
+      if (!loading) {
+        setShowModal(true);
+      }
     },
-    [loading, isDragging]
+    [loading]
   );
 
   const handleKeyDown = useCallback(
@@ -216,72 +262,100 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
 
   if (!mounted) return null;
 
+  // Background gradient calculation
+  const computedBg = backgroundColor.startsWith('linear-gradient') || backgroundColor.startsWith('radial-gradient')
+    ? backgroundColor
+    : `radial-gradient(circle at 35% 30%, ${backgroundColor} 0%, rgba(15, 23, 42, 0.95) 120%)`;
+
   const widgetStyle: React.CSSProperties = {
     width: size,
     height: size,
-    backgroundColor,
+    background: computedBg,
     color: textColor,
-    borderRadius: '50%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: loading ? 'default' : isDragging ? 'grabbing' : 'grab',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-    border: '2px solid rgba(255, 255, 255, 0.25)',
-    fontSize: size > 50 ? '10px' : '8px',
-    fontWeight: 'bold',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-    touchAction: 'none',
-    transition: isDragging ? 'none' : 'box-shadow 0.2s ease, transform 0.2s ease',
-    zIndex: 9999,
-    padding: '4px',
-    position: 'fixed',
+    cursor: loading ? 'wait' : isDragging ? 'grabbing' : 'pointer',
+    fontSize: size > 56 ? '11px' : '9px',
+    padding: '4px'
+  };
+
+  const containerStyle: React.CSSProperties = {
     left: position.x,
     top: position.y
   };
 
-  const title =
-    weatherData ? `${weatherData.temperature}\u00B0C - ${weatherData.description}` : error ? `Erro: ${error}` : 'Carregando...';
+  const title = weatherData
+    ? `${weatherData.city}: ${weatherData.temperature}°C, ${weatherData.description}`
+    : error
+    ? `Erro: ${error}`
+    : 'Carregando previsão...';
+
+  const isNearTop = position.y < 55;
 
   return (
     <>
       <div
-        className="tempo-widget"
-        style={widgetStyle}
-        onMouseDown={handleMouseDown}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        role="button"
-        aria-label={title}
-        title={title}
+        className={`tempo-widget-container ${className}`}
+        style={containerStyle}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        {loading ? (
-          <div className="tempo-widget-loading" aria-hidden>{'\u23F3'}</div>
-        ) : error ? (
-          <div className="tempo-widget-error" aria-label="Erro ao carregar">
-            {'\u274C'}
+        <div
+          className={`tempo-widget ${isDragging ? 'tempo-widget--dragging' : ''}`}
+          style={widgetStyle}
+          onMouseDown={handleMouseDown}
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="button"
+          aria-label={title}
+          title={title}
+        >
+          {loading ? (
+            <div className="tempo-widget-loading-spinner" aria-hidden />
+          ) : error ? (
+            <div className="tempo-widget-error" aria-label="Erro ao carregar">
+              ⚠️
+            </div>
+          ) : weatherData ? (
+            <>
+              <span className="tempo-widget-status-dot" title="Clima em tempo real" />
+              <div
+                className="tempo-widget-icon"
+                style={{ fontSize: size > 56 ? Math.round(size * 0.3) : 16 }}
+              >
+                {weatherData.icon}
+              </div>
+              <div
+                className="tempo-widget-temp"
+                style={{ fontSize: size > 56 ? Math.round(size * 0.28) : 15 }}
+              >
+                {weatherData.temperature}°
+              </div>
+              <div
+                className="tempo-widget-city"
+                style={{ fontSize: size > 56 ? '8.5px' : '7.5px' }}
+              >
+                {getCleanCityName(weatherData.city)}
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        {/* Hover quick preview pill */}
+        {showTooltip && isHovered && !isDragging && !loading && weatherData && (
+          <div
+            className="tempo-widget-tooltip"
+            style={isNearTop ? { bottom: 'auto', top: 'calc(100% + 10px)' } : undefined}
+          >
+            <span className="tempo-widget-tooltip-dot" />
+            <span>
+              <strong>{getCleanCityName(weatherData.city)}</strong> • {weatherData.temperature}°C {weatherData.description}
+            </span>
           </div>
-        ) : weatherData ? (
-          <>
-            <div className="tempo-widget-icon" style={{ fontSize: size > 50 ? 18 : 16 }}>
-              {weatherData.icon}
-            </div>
-            <div className="tempo-widget-temp" style={{ fontSize: size > 50 ? 16 : 14 }}>
-              {weatherData.temperature}{'\u00B0'}
-            </div>
-            <div className="tempo-widget-city" style={{ fontSize: size > 50 ? 8 : 7 }}>
-              {weatherData.city.split(' ')[0]}
-            </div>
-          </>
-        ) : null}
+        )}
       </div>
 
       {showModal && (
@@ -292,9 +366,12 @@ export const TempoWidget: React.FC<TempoPluginProps> = ({
           theme={theme}
           onClose={() => setShowModal(false)}
           onCityChange={handleCityChange}
+          onResetLocation={handleResetLocation}
           onRetry={fetchWeatherData}
         />
       )}
     </>
   );
 };
+
+export default TempoWidget;
